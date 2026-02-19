@@ -1,4 +1,4 @@
-# Code Documentation
+# Upsolution Documentation
 
 This directory contains comprehensive documentation for all source code files in the project. The folder structure mirrors the source code structure for easy navigation.
 
