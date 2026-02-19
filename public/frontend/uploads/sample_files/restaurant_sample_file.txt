@@ -1,0 +1,2 @@
+﻿Restaurant Old Id~Restaurant Logo~Restaurant Landing Image~Restaurant Name In English~Restaurant Name In Arabic~Contact Person~Account Manager~Phone Number~Email~Address~Description
+234567~restaurant_logo.png~restaurant_landing_image.jpg~Mais Alghanim Restaurant~طعم ميس~James~Mr. Max~1234567~mais.restaurant@mailinator.com~USA~Best restaurant

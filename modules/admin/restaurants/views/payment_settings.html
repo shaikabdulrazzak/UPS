@@ -1,0 +1,150 @@
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-settings" action="<%= admin_list_url%>/<%=restaurant_slug%>/payment_settings" data-modal-id="form_modal" data-submit-btn-id="settings-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.restaurants.upayment_settings"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="uInterface_base_url" class="control-label">
+											<%= __("admin.restaurants.uInterface_base_url"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="uInterface_base_url" name="uInterface_base_url"  class="form-control" placeholder="<%= __('admin.restaurants.uInterface_base_url')%>" value="<%=(result.uInterface_base_url)?result.uInterface_base_url:''%>"/>
+									</div>
+									<span id="uInterface_base_url_error" class="error"></span>
+								</div>
+							</div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="uInterface_api_key" class="control-label">
+                                            <%= __("admin.restaurants.uInterface_api_key"); %><span class="required"> *</span>
+                                        </label>
+                                        <input type="text" id="uInterface_api_key" name="uInterface_api_key" class="form-control"
+                                            placeholder="<%= __('admin.restaurants.uInterface_api_key')%>" value="<%=(result.uInterface_api_key)?result.uInterface_api_key:''%>" />
+                                    </div>
+                                    <span id="uInterface_api_key_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row clearfix">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="uInterface_username" class="control-label">
+                                            <%= __("admin.restaurants.uInterface_username"); %><span class="required"> *</span>
+                                        </label>
+                                        <input type="text" id="uInterface_username" name="uInterface_username" class="form-control"
+                                            placeholder="<%= __('admin.restaurants.uInterface_username')%>" value="<%=(result.uInterface_username)?result.uInterface_username:''%>" />
+                                    </div>
+                                    <span id="uInterface_username_error" class="error"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="uInterface_password" class="control-label">
+                                            <%= __("admin.restaurants.uInterface_password"); %><span class="required"> *</span>
+                                        </label>
+                                        <input type="text" id="uInterface_password" name="uInterface_password" class="form-control"
+                                            placeholder="<%= __('admin.restaurants.uInterface_password')%>" value="<%=(result.uInterface_password)?result.uInterface_password:''%>" />
+                                    </div>
+                                    <span id="uInterface_password_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row clearfix">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="uInterface_authorization_key" class="control-label">
+                                            <%= __("admin.restaurants.uInterface_authorization_key"); %><span class="required"> *</span>
+                                        </label>
+                                        <input type="text" id="uInterface_authorization_key" name="uInterface_authorization_key" class="form-control"
+                                            placeholder="<%= __('admin.restaurants.uInterface_authorization_key')%>" value="<%=(result.uInterface_authorization_key)?result.uInterface_authorization_key:''%>" />
+                                    </div>
+                                    <span id="uInterface_authorization_key_error" class="error"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <label for="uInterface_merchant_id" class="control-label">
+                                            <%= __("admin.restaurants.uInterface_merchant_id"); %><span class="required"> *</span>
+                                        </label>
+                                        <input type="text" id="uInterface_merchant_id" name="uInterface_merchant_id"
+                                            class="form-control" placeholder="<%= __('admin.restaurants.uInterface_merchant_id')%>" value="<%=(result.uInterface_merchant_id)?result.uInterface_merchant_id:''%>" />
+                                    </div>
+                                    <span id="uInterface_merchant_id_error" class="error"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row clearfix">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <div class="switch">
+                                            <label for="uInterface_test_mode" class="control-label">
+                                                <%= __("admin.restaurants.uInterface_test_mode"); %><span class="required"> *</span>
+                                            </label>
+                                            <label>
+                                                <input id="uInterface_test_mode" name="uInterface_test_mode" type="checkbox"
+                                                    <%=(result.uInterface_test_mode==ACTIVE) ? "checked" :""; %>>
+                                                <span class="lever switch-col-green"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <div class="form-line">
+                                        <div class="switch">
+                                            <label for="uInterface_whitelabled" class="control-label">
+                                                <%= __("admin.restaurants.uInterface_whitelabled"); %><span class="required"> *</span>
+                                            </label>
+                                            <label>
+                                                <input id="uInterface_whitelabled" name="uInterface_whitelabled" type="checkbox"
+                                                    <%=(result.uInterface_whitelabled==ACTIVE) ? "checked" :""; %>>
+                                                <span class="lever switch-col-green"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="settings-add-btn-id" class="btn bg-brown btn-sm waves-effect settings-add-btn-submit" <%- ADMIN_LOADING_TEXT %> > <%= __("admin.system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	/**
+	 * Function to submit form
+	 */
+	$('.settings-add-btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-settings',function(status,response){
+			if(status){
+				window.location.reload();
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+</script>

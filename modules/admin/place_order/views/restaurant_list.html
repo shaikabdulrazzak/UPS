@@ -1,0 +1,172 @@
+<%
+	let restaurantList	=	(typeof data != typeof undefined && data.result) ? data.result :	[];
+	let totalRestaurant	=	(typeof data != typeof undefined) ? data.total_restaurant :	0;
+	let imageUrl		=	(typeof data != typeof undefined) ? data.restaurant_image_url :	'';
+	let userId			=	(user_id) ? user_id :	'';
+	let languageCode	=	(item_display_lng_code) ? item_display_lng_code :DEFAULT_LANGUAGE_CODE;
+if(!load_more){%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="modal-dialog modal-lg"  role="document">
+			<div class="modal-content restaurant-list-popup">
+				<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+					<h2 class="modal-title">
+						<%= __("admin.order_food.restaurants"); %><span class="cursor-pointer modal-close pull-right" data-dismiss="modal"><i class="material-icons">close</i></span>
+					</h2>
+				</div>
+				<div class="modal-body padding-20">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<form id="place-order" data-submit-btn-id="place-order-btn-id" action="<%=WEBSITE_ADMIN_URL+"place_order/"+user_id%>" method="post" class="on_click_submit" role="form">
+								<div class="row clearfix">
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="form-line">
+												<label for="restaurant_name" class="control-label col-555">
+													<%= __("admin.orders.restaurant_name"); %>
+												</label>
+												<input type="text" id="restaurant_name" class="form-control" name="restaurant_name" value=""/>
+											</div>
+										</div>
+									</div>
+									<div class="col-sm-6 m-t-25">
+										<button type="button" id="place-order-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+											<%= __("admin.system.search"); %>
+										</button>
+									</div>
+								</div>
+							</form>
+
+							<ul class="food-listing"><% }
+								if(restaurantList.length > 0){
+									restaurantList.map(list=>{
+										let isCashback			=	(list.is_cashback) ? list.is_cashback : 0;
+										let isDoubleCashback	=	(list.is_double_cashback) ? list.is_double_cashback : 0;
+										let branchStatus		=	(list.branch_status) ? list.branch_status : 0;
+										let isOpen				=	(list.is_open) ? list.is_open : 0;
+
+										%>
+										<li class="rest_list">
+											<div class="food_item restaurant-<%= list._id%>">
+												<a href="javascript:void(0);" class="open-categories" data-action="<%= WEBSITE_ADMIN_URL+'place_order/checkout'%>" data-restaurant-id="<%= list._id%>" data-user-id="<%= userId%>">
+													<figure>
+														<img src="<%= imageUrl+list.image%>" alt="<%= list.name[languageCode]%>" onerror="this.src='<%= NO_IMAGE_AVAILABLE%>'" class="set_image_dim-254">
+													</figure>
+													<div class="food_item_content">
+														<h4><%= (list.name) ? list.name[languageCode] :""; %></h4>
+													</div>
+												</a>
+											</div>
+										</li><%
+										skip++;
+									});
+								}else{ %>
+									<li class="no-record-found text-center"><%= __('admin.system.no_record_found');%></li><%
+								}
+								if(!load_more){ %>
+							</ul>
+							<div class="text-center loadmore <%= (totalRestaurant > skip) ? '' : 'hide';%>">
+								<a href="javascript:void(0)" data-skip="<%=skip%>" id="view_more" class="btn getbtn btn-primary btn-rounded"><%= __("admin.order_food.show_more")%> </a>
+							</div>
+						</div>
+					</div>
+					<div class="append_address"></div>
+					<div class="address_loading hide text-center">
+						<img src='<%=WEBSITE_IMG_URL%>pagination_loader.gif' alt='Loading...' />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="listModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"></div>
+
+<script type="text/javascript">
+	$(".show-tick").selectpicker('refresh');
+
+	/**
+	* Get more content by ajax
+	*/
+	$("#view_more").click(function(e){
+		startTextLoading('view_more');
+		var skip = $(this).attr("data-skip");
+		getData(skip);
+	});
+
+	/**
+    * Get more content by ajax
+    */
+    function getData(skip){
+		$.ajax({
+			url       : '<%= WEBSITE_ADMIN_URL+"place_order/"+user_id%>/'+skip,
+			type      : "POST",
+			data      : {
+				user_id	: '<%= user_id%>',
+				load_more : true,
+				skip	: '<%= skip%>',
+			},
+			success: function(response){
+				$('.food-listing').append(response);
+				var totalRest	=	'<%= totalRestaurant%>';
+				var limit		=	'<%= (settings['Site.front_record_limit']) ? parseInt(settings['Site.front_record_limit']) :FRONT_LISTING_LIMIT %>';
+				var skip		=	parseInt($('#view_more').attr('data-skip')) + parseInt(limit);
+				if(totalRest > skip){
+					$('.loadmore').removeClass('hide');
+				}else{
+					$('.loadmore').addClass('hide');
+				}
+				$('#view_more').attr('data-skip',skip);
+				stopTextLoading('view_more');
+			},
+		});
+    }
+
+    /**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('place-order',function(status,response){
+			if(typeof response !== 'object'){
+				$('#form_modal').html(response);
+			}
+			stopTextLoading(btnId);
+		});
+	});
+
+	$('.action-btn').click(function(){
+		startTextLoading('back_button');
+	});
+</script><%
+} %>
+<script type="text/javascript">
+	/**
+	* To open menu list of restaurant
+	*/
+	$('.open-categories').click(function(e){
+		var url			=	$(this).attr('data-action');
+		var restaurantId=	$(this).attr('data-restaurant-id');
+		var areaId		=	$(this).attr('data-area-id');
+		var userId		=	$(this).attr('data-user-id');
+		$('.address_loading').removeClass('hide').show();
+		$('.food_item').removeClass('blue-border');
+		$.ajax({
+			url       : url,
+			type      : "POST",
+			data	  : {restaurant_id:restaurantId,user_id:userId, area_id: areaId,},
+			success: function(response){
+				$('.append_address').html(response);
+				$('#form_modal').animate({
+					scrollTop: $(".append_address").offset().top
+				}, 1000);
+				$('.address_loading').addClass('hide').hide();
+				$('.restaurant-'+restaurantId).addClass('blue-border');
+				if('<%= address_id %>'){
+					$("input[value="+'<%= address_id %>'+"]").prop('checked', true);
+				}
+			},
+		});
+	});
+</script>

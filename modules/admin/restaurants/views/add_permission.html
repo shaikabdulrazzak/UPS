@@ -1,0 +1,131 @@
+<%
+	let branchPermission	=	(result.branch_permission) ? result.branch_permission : [];
+	let employeePermission	=	(result.employee_permission) ? result.employee_permission : [];
+	branchPermission	=	(branchPermission.length > 0 ) ? branchPermission.map(branch=>{ return String(branch)}) : '';
+	employeePermission	=	(employeePermission.length > 0 ) ? employeePermission.map(employee=>{ return String(employee)}) : '';
+	
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-tickets" action="" data-submit-btn-id="tickets-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.restaurants.permission"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix"><%
+							RESTAURANT_USERS_ROLE.map(users => { %>
+								<div class="col-sm-6">
+									<div class="form-group">
+										<div class="form-line">
+											<label for="<%= users%>" class="control-label col-555">
+												<%= __("admin.restaurants."+users+"_permissions"); %><span class="required"> *</span>
+											</label>
+											<% 
+											Object.keys(RESTAURANT_PERMISSION_MODULES).map(modules=>{
+												let checked	=	'';
+												if(users == BRANCH_MANAGER){
+													checked	=	(branchPermission.indexOf(modules) != -1) ? 'checked' : '';
+												}else{
+													checked	=	(employeePermission.indexOf(modules) != -1) ? 'checked' : '';
+												}
+												%>
+												<div class="row">
+													<div class="materialize_checkbox permission_box">
+														<div class="checkbox_wrapper">
+															<input type="checkbox" class="filled-in chk-col-indigo" data-module="<%= users%>" data-id="<%= modules%>" name="<%= users%>[<%= modules %>]" id="<%= users+'_'+modules%>" <%= checked%>>
+															<label for="<%= users+'_'+modules%>" class="checkbox data"><%= RESTAURANT_PERMISSION_MODULES[modules]%></label>
+														</div>
+													</div>
+												</div><%
+											}); %>	
+										</div>
+										<span id="<%= users%>_error" class="error"></span>
+									</div>
+								</div><%
+							}); %>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="tickets-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-blue-grey btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							 <%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var managerCheckboxArray 	= {};
+	var employeeCheckboxArray 	= {};
+	var branchPermission	=	<%- JSON.stringify(branchPermission);%>;
+	var employeePermission	=	<%- JSON.stringify(employeePermission);%>;
+	if(branchPermission.length > 0){
+		branchPermission.map(branches => {
+			managerCheckboxArray[branches]	=	true;
+		});
+	}
+	if(employeePermission.length > 0){
+		employeePermission.map(branches => {
+			employeeCheckboxArray[branches]	=	true;
+		});
+	}
+	
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		var managerIdArray = Object.keys(managerCheckboxArray);
+		var employeeIdArray = Object.keys(employeeCheckboxArray);
+		var options = {
+			url 	: 	"<%=admin_list_url%>/<%= restaurant_slug%>/add_permission",
+			data	: 	{branch_manager: managerIdArray.join(","),branch_employee: employeeIdArray.join(",")},
+			method	:	"post"
+		};
+		ajaxRequest(options,function(response){
+			if(response.status != 'success'){
+				stopTextLoading(btnId);
+				$.each(response.message,function(index,html){
+					$(' #'+html.param+'_error').prev('.form-line').addClass('error');
+					$(' #'+html.param+'_error').html(html.msg).show();
+					
+				});
+			}else{
+				window.location.reload();
+			}
+			
+		});
+	});
+	
+	/**Check/Uncheck checkbox*/
+	$(document).on('change','.checkbox_wrapper input[type="checkbox"]',function(){
+		var id          = $(this).attr('data-id');
+		var module      = $(this).attr('data-module');
+		var isChecked	= $(this).is(':checked');
+		if(isChecked){
+			if(module == '<%= BRANCH_MANAGER %>'){
+				managerCheckboxArray[id] = true;
+			}else{
+				employeeCheckboxArray[id] = true;
+			}
+		}else{
+			if(module == '<%= BRANCH_MANAGER %>'){
+				delete managerCheckboxArray[id];
+			}else{
+				delete employeeCheckboxArray[id];
+			}
+		}
+	});
+
+	$("#add-tickets .show-tick").selectpicker('refresh');
+</script>

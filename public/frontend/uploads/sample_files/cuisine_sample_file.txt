@@ -1,0 +1,5 @@
+Main Category Id~Main Category Name~Is Available
+1~Vietnamese food~1
+2~French food~0
+3~Indian food~1
+4~Italian food~0

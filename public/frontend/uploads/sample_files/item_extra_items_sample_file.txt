@@ -1,0 +1,4 @@
+Extra Items Old Id~Item Id~Item Unit Id~Name In English~Name In Arabic~Extra Fees
+567345~713143~~Extra Item English name~Extra Item Arabic name~1
+713143~~~Extra Item English name 1~Extra Item Arabic name 1~1.45
+713143~~~Extra Item English name 2~Extra Item Arabic name 2~2.15

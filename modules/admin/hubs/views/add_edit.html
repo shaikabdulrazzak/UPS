@@ -1,0 +1,118 @@
+<%
+var data 		= 	(typeof data !== typeof undefined) ?	data : {};
+var formUrl 	=	(isEditable)	?	admin_list_url+"/edit/"+data._id :admin_list_url+"/add";
+var branchList  = 	(typeof branch_list !== typeof undefined && branch_list) ? branch_list :"";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-hubs" action="<%=formUrl%>" data-submit-btn-id="hubs-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog  modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.hubs.edit_hubs") : __("admin.hubs.add_hubs"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_english" class="control-label">
+											<%= __("admin.hubs.name_in_english"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_english" class="form-control" name="name_english" value="<%=data.name ? data.name.en :''; %>" />
+									</div>
+									<span id="name_english_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_arabic" class="control-label">
+											<%= __("admin.hubs.name_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_arabic" class="form-control" name="name_arabic" value="<%=data.name ? data.name.ar :''; %>" />
+									</div>
+									<span id="name_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-8">
+								<div class="form-group">
+									<div class="form-line">
+										<div class="form-line">
+											<label for="branch_id" class="control-label">
+												<%= __("admin.hubs.branches"); %><span class="required"> *</span>
+											</label>
+											<select class="form-control show-tick" name="branches" id="branch_id" data-live-search="true"  data-title="<%=__('admin.hubs.select_branches')%>" multiple >
+												<%-branchList%> 
+											</select>
+										</div>
+									</div>
+									<span id="branches_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-2 m-t-25">
+								<button type="button" id="select_all_area" class="btn bg-brown btn-sm waves-effect col-white ">
+									<%= __("admin.hubs.select_all"); %>
+								</button>
+							</div>
+							<div class="col-sm-2 m-t-25 m-t-25">
+								<button type="button" id="unselect_all_area" class="btn bg-pink btn-sm waves-effect col-white ">
+									<%= __("admin.hubs.unselect_all"); %>
+								</button>
+							</div>
+					    </div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="hubs-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(".show-tick").selectpicker('refresh');
+
+	/**
+	 * Function to submit form
+	*/
+	var isEditable = <%=isEditable%>;
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-hubs',function(status,response){
+			if(status){
+				if(isEditable){
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					if(response.status && response.message) notice(response.status,response.message);
+					$('#form_modal').modal("hide");
+				}else{
+					$("#reset").trigger("click");
+				}
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/** Select all branch list */
+	$('#select_all_area').click(function(){
+		$('#branch_id').selectpicker('selectAll');
+	});
+
+	/** unselect all branch list */
+	$('#unselect_all_area').click(function(){
+		$('#branch_id').val("").selectpicker('refresh');
+	});
+</script>

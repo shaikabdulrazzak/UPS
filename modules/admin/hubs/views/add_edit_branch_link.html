@@ -1,0 +1,104 @@
+<%
+	var result 		= 	(typeof result !== typeof undefined && result)			 	?	result 		:{};
+	var isEditable 	= 	(typeof is_editable !== typeof undefined && is_editable) 	?	is_editable :false;
+	var branchList  = 	(typeof branch_list !== typeof undefined && branch_list) 	? 	branch_list 	:"";
+	var hubId		=	hub_id;
+	let formUrl		=   admin_list_url+"/add_branch_linking/"+hubId;
+	if(isEditable) formUrl = admin_list_url+"/add_branch_linking/"+hubId+'/'+result._id;
+%>
+<div class="row clearfix" >
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-branch-link" action="<%=formUrl%>" data-submit-btn-id="branches-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.hubs.edit_branch_linking") : __("admin.hubs.add_branch_linking"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_english" class="control-label">
+											<%= __("admin.hubs.name_in_english"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_english" class="form-control" name="name_english" value="<%=result.name ? result.name.en : ""%>"/>
+									</div>
+									<span id="name_english_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_arabic" class="control-label">
+											<%= __("admin.hubs.name_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_arabic" class="form-control" name="name_arabic" value="<%=result.name ? result.name.ar : ""%>"/>
+									</div>
+									<span id="name_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="branch_list" class="control-label">
+											<%= __("admin.hubs.branches"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick" data-title='<%= __("admin.hubs.select_branches"); %>' name="branch_ids" id="branch_ids" data-live-search="true" multiple>
+											<%-branchList%>
+										</select>
+										<input type="text" class="form-control hidden" name="old_branch_ids" value="<%=result.branch_ids ? result.branch_ids : ""%>"/>
+									</div>
+									<span id="branch_ids_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="branches-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	var isEditable =  <%=isEditable%>;
+
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-branch-link',function(status,response){
+			if(status){
+				if(isEditable){
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					$('#form_modal').modal("hide");
+					window.location.href = response.redirect_url
+				}else{
+					console.log(response);
+					$("#reset").trigger("click");
+					window.location.href = response.redirect_url
+				}
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+</script>

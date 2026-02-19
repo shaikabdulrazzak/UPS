@@ -1,0 +1,253 @@
+<%
+	var restaurantId		= 	(restaurant_id)	?	restaurant_id	:"";
+	let branchDetail		=	(branch_detail) ? branch_detail : [];
+	var branchId			= 	(branch_detail && branch_detail[0])		?	branch_detail[0]._id		:"";
+	var customerId			= 	(user_id)		?	user_id			:"";
+	var date				=	newDate("",AM_PM_FORMAT_WITH_DATE);
+	let languageCode		=	(item_display_lng_code) ? item_display_lng_code :DEFAULT_LANGUAGE_CODE;
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="orderfood-popup">
+			<div class="modal-body padding-0">
+				<ul class="nav nav-tabs" id="nav-tab" role="tablist">
+					<li role="presentation" class="active">
+						<a id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false"> <%= __("admin.order.delivery"); %></a>
+					</li>
+					<li role="presentation">
+					<a id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true"> <%=__("admin.order.pickup_food")%></a>
+					</li>
+				</ul>
+				<input name="call_date_time" id="call_date_time" type="text" class="form-control datepicker" readonly value="<%= date%>"/>
+				<input name="is_scheduled" id="is_scheduled" type="hidden" value="0"/>
+
+				<div class="tab-content" id="nav-tabContent">
+					<div class="tab-pane fade" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+						<%
+							if(branchDetail && branchDetail.length > 0){ %>
+								<ul class="addresslist"><%
+									branchDetail.map((records,keys)=>{
+										%>
+										<li>
+											<div class="address-box">
+													<input type="radio" class="comman_unit with-gap branch_id" name="branch_id" id="branch_<%= keys %>" value="<%= records._id %>">
+													<label for="branch_<%= keys %>">
+														<p>
+															<%= (records.name) ? records.name[languageCode] : '';%> <br/>
+															<%= (records.address) ? records.address : '';%>
+														</p>
+													</label>
+											</div>
+										</li><%
+									}); %>
+
+								</ul>
+								<span id="branch_id_error" class="error"></span><%
+							}else{ %>
+								<div class="row"><div class="col-sm-12 text-center"><%= __('admin.system.no_record_found')%></div></div><%
+							}
+						%>
+						<div class="row">
+							<div class="text-center col-sm-3"></div>
+							<div class="text-center col-sm-3">
+								<button type="button" id="branch-add-btn-id" class="btn btn-warning btn-sm waves-effect btn-branch-submit" <%- ADMIN_LOADING_TEXT %> >
+									<%= __("admin.user_management.place_order"); %>
+								</button>
+							</div>
+							<div class="text-center col-sm-3">
+								<button type="button" id="reorder-btn-id" data-id="<%= DELIVERY_BY_PICK_UP %>" class="btn btn-warning btn-sm waves-effect btn-reorder-submit" <%- ADMIN_LOADING_TEXT %> >
+									<%= __("admin.user_management.reorder"); %>
+								</button>
+							</div>
+							<div class="text-center col-sm-3"></div>
+						</div>
+					</div>
+					<div class="tab-pane fade active in" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+						<div class="text-center"><a href="javascript:void(0);" class="add_address btn btn-success m-t-20 m-b-20 btn-sm waves-effect" data-action="<%=WEBSITE_ADMIN_URL%>place_order/add_address" data-restaurant-id="<%= restaurant_id%>" data-user-id="<%= user_id%>"><%= __("admin.user_management.add_address"); %></a> </div>
+						<%
+							if(address_detail && address_detail.length > 0){ %>
+								<ul class="addresslist">
+									<%
+										address_detail.map((records,keys)=>{
+											var checked	=	'';
+											if(address_id){
+												checked	=	(String(records._id) == String(address_id)) ? 'checked' : '';
+											}
+
+											%>
+											<li class="choose_address">
+												<div class="address-box">
+														<input type="radio" class="comman_unit with-gap address_id" name="address_id" id="address_<%= keys %>" value="<%= records._id %>" <%= checked%> data-area-id="<%= records.area_id%>">
+														<label for="address_<%= keys %>">
+															<p>
+																<b class="font-16"><%= (records.area_name) ? records.area_name[languageCode] : '';%></b><br/>
+																<%= (records.block_name) ? records.block_name[languageCode] : '';%><br/>
+																<%= (records.street) ? records.street : '';%>,
+																<%= (records.building_number) ? records.building_number : '';%><br/>
+																<%= (records.floor_number) ? records.floor_number : '';%>
+															</p>
+														</label>
+														<a href="javascript:void(0);" data-action="<%=WEBSITE_ADMIN_URL%>place_order/add_address/<%= records._id%>" data-open-modal="true" class="add_address" data-restaurant-id="<%= restaurant_id%>" data-user-id="<%= user_id%>" data-area-id="<%= records.area_id%>">
+															<button type="button" class="btn btn-xs bg-indigo waves-effect noHover">
+																<i class="material-icons">mode_edit</i>
+															</button>
+														</a>
+												</div>
+											</li><%
+										}); %>
+
+
+								</ul>
+								<span id="address_id_error" class="error"></span><%
+							}else{ %>
+								<div class="row"><div class="col-sm-12 text-center"><%= __('admin.system.no_record_found')%></div></div><%
+							}
+							if(address_detail && address_detail.length > 0){ %>
+								<div class="row">
+									<div class="text-center col-sm-3"></div>
+									<div class="text-center col-sm-3">
+										<button type="button" id="address-add-btn-id" class="btn btn-warning btn-sm waves-effect btn-address-submit" <%- ADMIN_LOADING_TEXT %> >
+											<%= __("admin.user_management.place_order"); %>
+										</button>
+									</div>
+									<div class="text-center col-sm-3">
+										<button type="button" id="reorder-btn-id" data-id="<%= DELIVERY_BY_CRAVEZ %>" class="btn btn-warning btn-sm waves-effect btn-reorder-submit" <%- ADMIN_LOADING_TEXT %> >
+											<%= __("admin.user_management.reorder"); %>
+										</button>
+									</div>
+									<div class="text-center col-sm-3"></div>
+								</div><%
+							}
+						%>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		initDateRangePicker();
+
+		/** For tiime picker **/
+		$('#call_date_time').datetimepicker({
+			format			: '<%=DATE_PICKER_DATE_TIME_FORMAT%>',
+			ignoreReadonly	: true,
+			minDate			: moment(),
+			timeZone		: DEFAULT_TIME_ZONE
+		});
+
+		$("#call_date_time").on("dp.change", function (e) {
+			$('#is_scheduled').val(1);
+		});
+
+		$( '#call_date_time' ).val('<%= date%>');
+	});
+
+	/**
+	 * Default delivery option checked
+	 */
+	$('#nav-profile-tab').click();
+
+	/**
+	 * To add address
+	 */
+	$('.add_address').click(function(){
+		var url			=	$(this).attr('data-action');
+		var restaurantId=	$(this).attr('data-restaurant-id');
+		var branchId	=	$(this).attr('data-branch-id');
+		var userId		=	$(this).attr('data-user-id');
+		var areaId		=	$(this).attr('data-area-id');
+		$.ajax({
+			url       : url,
+			type      : "POST",
+			data	  : {branch_id : branchId,restaurant_id:restaurantId,user_id:userId, area_id: areaId},
+			success: function(response){
+				$('#form_modal').html(response);
+				$('#form_modal').animate({
+					scrollTop: $("#add-address").offset().top
+				}, 50);
+			},
+		});
+	});
+
+	/**
+	 * To submit address form
+	 */
+	$('.btn-address-submit').click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		var addressId	=	$('input[name=address_id]:checked').val();
+		var areaId		=	$('input[name=address_id]:checked').attr('data-area-id');
+		var dateTime	=	$('#call_date_time').val();
+		var isScheduled	=	$('#is_scheduled').val();
+		$.ajax({
+			url       : '<%= admin_list_url%>/item_list',
+			type      : "POST",
+			data	  : {branch_id : '<%= branchId%>',restaurant_id:'<%= restaurantId%>',address_id:addressId,user_id:'<%= customerId%>','delivery_by': '<%= DELIVERY_BY_CRAVEZ%>', area_id: areaId,scheduled_time:dateTime,is_scheduled:isScheduled},
+			success: function(response){
+				if(response.status == 'error'){
+					notice('error',response.message);
+					stopTextLoading(btnId);
+				}else{
+					$('#form_modal').html(response);
+				}
+			},
+		});
+	});
+
+	/**
+	 * To submit branch form
+	 */
+	$('.btn-branch-submit').click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+		var branchId	=	$('input[name=branch_id]:checked').val();
+		var dateTime	=	$('#call_date_time').val();
+		var isScheduled	=	$('#is_scheduled').val();
+		$.ajax({
+			url       : '<%= admin_list_url%>/item_list',
+			type      : "POST",
+			data	  : {branch_id : branchId,restaurant_id:'<%= restaurant_id%>',user_id:'<%= customerId%>','delivery_by': '<%= DELIVERY_BY_PICK_UP%>',scheduled_time:dateTime,is_scheduled:isScheduled},
+			success: function(response){
+				if(response.status == 'error'){
+					notice('error',response.message);
+					stopTextLoading(btnId);
+				}else{
+					$('#form_modal').html(response);
+				}
+			},
+		});
+	});
+
+	/**
+	 * To submit Reorder
+	 */
+	$('.btn-reorder-submit').click(function(){
+		var btnId = $(this).attr("id");
+		var deliveryBy 	= 	$(this).attr("data-id");
+		var branchId	=	$('input[name=branch_id]:checked').val();
+		startTextLoading(btnId);
+		var addressId	=	$('input[name=address_id]:checked').val();
+		var areaId		=	$('input[name=address_id]:checked').attr('data-area-id');
+		var dateTime	=	$('#call_date_time').val();
+		var isScheduled	=	$('#is_scheduled').val();
+		$.ajax({
+			url       : '<%= admin_list_url%>/reorder_list',
+			type      : "POST",
+			data	  : {branch_id : branchId,restaurant_id:'<%= restaurantId%>',address_id:addressId,user_id:'<%= customerId%>','delivery_by': deliveryBy, area_id: areaId,scheduled_time:dateTime,is_scheduled:isScheduled},
+			success: function(response){
+				if(response.status == 'error'){
+					notice('error',response.message);
+					stopTextLoading(btnId);
+				}else{
+					$('#form_modal').html(response);
+					dataTable.columns.adjust();
+				}
+			},
+		});
+	});
+</script>
+

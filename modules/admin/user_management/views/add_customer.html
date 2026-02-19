@@ -1,0 +1,170 @@
+<%
+	var refereeEnable	= settings["Rewards_and_referrals.enable_referee_amount"];
+	var referralEnable	= settings["Rewards_and_referrals.enable_referral_amount"];
+	var result 		= (result) ? result   : {};
+	var gender		= (result.gender != "") 				? 	result.gender 	:"";
+	var isEditable  = (typeof is_editable !== typeof undefined && is_editable) ? is_editable : "";
+%>
+<div class="container-fluid" id="main-container">
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%= (isEditable) ? __("admin.user_management.edit_customer") : __("admin.user_management.add_customer"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin">
+						<li>
+							<a href="<%=admin_list_url%>/list_customer" ><button type="button" class="btn btn-sm bg-indigo waves-effect"> <%= __("admin.system.back"); %></button></a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<form id="add-customer" data-submit-btn-id="customer-add-btn-id" method="post" class="on_click_submit" role="form">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="first_name" class="control-label"><%= __('admin.user_management.first_name'); %><span class="required">*</span> :</label>
+										<input name="first_name" id="first_name" type="text" value="<%=result.first_name%>" class="form-control"/>
+									</div>
+									<span id="first_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="last_name" class="control-label"><%= __('admin.user_management.last_name'); %><span class="required">*</span> :</label>
+										<input name="last_name" id="last_name" type="text" value="<%=result.last_name%>" class="form-control"/>
+									</div>
+									<span id="last_name_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="mobile_number" class="control-label"><%= __('admin.user_management.phone_number'); %><span class="required">* </span> :</label>
+										<input name="mobile_number" id="mobile_number" type="text" class="form-control" value="<%=result.mobile_number%>"/>
+									</div>
+									<span id="mobile_number_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="cust_tele2" class="control-label"><%= __('admin.user_management.secondary_mobile_number'); %><span class="required"> </span> :</label>
+										<input name="cust_tele2" id="cust_tele2" type="text" class="form-control" value="<%=result.cust_tele2%>"/>
+									</div>
+									<span id="cust_tele2_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<input name="place_order" id="place_order" type="hidden"/>
+						<button type="button" id="customer-add-btn-id" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit" >
+							<%= __('admin.system.submit'); %>
+						</button><%
+						if(!isEditable){ %>
+							<button type="button" id="customer-add-btn-id1" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit " data-attr="1">
+								<%= __('admin.system.submit_and_place_order'); %>
+							</button><%
+						} %>
+						<a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("admin.system.reset"); %></button></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		var	dateofbirth = "<%=(result.date_of_birth) ? result.date_of_birth :"";%>";
+
+		/**
+		 * Function to submit form
+		 */
+		$(".btn-submit").click(function(){
+			var btnId = $(this).attr("id");
+			var attr = $(this).attr("data-attr");
+			$('#place_order').val(attr);
+			startTextLoading(btnId);
+			ajax_submit("add-customer",function(status,response){  
+				if(response.number_exists){
+					var existId	=	response.exist_id;
+					swal({
+						title: '<%= __("admin.user_management.already_have_mobile_deactive_account")%>',
+						text: "<%- __("admin.user_management.want_to_deactive")%>",
+						type: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: "#DD6B55",
+						confirmButtonText: "<%= __("admin.system.deactive")%>",
+						closeOnConfirm: true,
+						showLoaderOnConfirm: false,
+					}, function (isConfirm) {
+						 if (isConfirm) {
+							var options		= {
+								url 	: "<%=admin_list_url%>/update-customer-status/"+existId+'/<%= ACTIVE%>',
+								method	: "POST"
+							}
+							ajaxRequest(options,function(response){
+								if(response){
+									ajax_submit("add-customer",function(status,response){ 
+										if(status){
+											window.location.href = response.redirect_url;
+										}else{
+											$('#place_order').val('');
+											stopTextLoading(btnId);
+										}
+									});
+								}
+							});
+						}else {
+							stopTextLoading(btnId);
+						}
+					});
+				}else if(response.exists){
+					var existId	=	response.exist_id;
+					swal({
+						title: '<%= __("admin.user_management.user_email_or_mobile_number_already_exists")%>',
+						text: "<%- __("admin.user_management.want_to_reclaim")%>",
+						type: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: "#DD6B55",
+						confirmButtonText: "<%= __("admin.user_management.reclaim")%>",
+						closeOnConfirm: false,
+						showLoaderOnConfirm: true,
+					}, function (isConfirm) {
+						 if (isConfirm) {
+							var options		= {
+								url 	: "<%=admin_list_url%>/reclaim/"+existId,
+								method	: "POST"
+							}
+							ajaxRequest(options,function(response){
+								if(response){
+									window.location.href = '<%= admin_list_url%>/list_customer'
+								}
+							});
+						}else {
+							stopTextLoading(btnId);
+						}
+					});
+				}else{
+					if(status){
+						window.location.href = response.redirect_url;
+					}else{
+						$('#place_order').val('');
+						stopTextLoading(btnId);
+					}
+				}
+			});
+		});
+	});
+</script>

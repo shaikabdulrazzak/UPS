@@ -1,0 +1,67 @@
+<%
+	var hubId			=	hub_details._id;
+	var selectedButton	=  	type ? type :"parameters";
+	var originalUrl 	=  	admin_list_url+"/view/"+hubId;
+%>
+<div class="container-fluid">
+	<div class="row clearfix ">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        <%= __('admin.hubs.hub_details')+ " ("+ hub_details.name[DEFAULT_LANGUAGE_CODE]+")" %>
+                    </h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin <%= getPermissionClass(module_type,['hubs','list']); %>">
+                        <li>
+                            <a href="<%=admin_list_url%>" ><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.system.back'); %></button></a>
+                        </li>
+                    </ul>
+				</div>
+				<div class="body">
+					<a href="javascript:void(0);" data-action-url="<%=admin_list_url%>/parameters/<%=hubId%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['hubs','view']); %>" data-type="parameters">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.hubs.parameters'); %>
+						</button>
+					</a>
+					<a href="javascript:void(0);" data-action-url="<%=admin_list_url%>/linked_areas/<%=hubId%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['hubs','view']); %>" data-type="linked_area">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.hubs.linked_area'); %>
+						</button>
+					</a>
+					<a href="javascript:void(0);" data-action-url="<%=admin_list_url%>/branch_linking/<%=hubId%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['hubs','view']); %>" data-type="branch_linking">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.hubs.branch_linking'); %>
+						</button>
+					</a>
+					<a href="javascript:void(0);" data-action-url="<%=admin_list_url%>/order_slabs/<%=hubId%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['hubs','view']); %>" data-type="order_slabs">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.hubs.order_slabs'); %>
+						</button>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="main-container"></div>
+</div>
+
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_CSS_PATH%>jquery-filestyle.min.css" >
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript">
+		/* Event triggered when click on tab btn */
+		$(document).on('click','.get-tab-details',function(e){
+			$('.get-tab-details').removeClass('active');
+			$(this).addClass('active');
+			var type = $(this).attr("data-type");
+			window.history.replaceState(null, null, "<%= originalUrl+'/'%>"+type);
+		});
+
+		$('[data-type="<%=selectedButton%>"]').trigger("click");
+	</script>
+
+
+

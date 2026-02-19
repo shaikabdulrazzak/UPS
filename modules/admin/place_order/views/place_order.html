@@ -1,0 +1,95 @@
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="place-order" data-submit-btn-id="place-order-btn-id" action="<%=WEBSITE_ADMIN_URL+"place_order/"+user_id%>" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.order_food.order_food"); %><span class="cursor-pointer modal-close pull-right" data-dismiss="modal"><i class="material-icons">close</i></span>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix text-center" style="display:none;">
+							<div class="form-group">
+								<div class="form-line">
+									<%
+									if(typeof PLACE_ORDER_DROPDOWN!== typeof undefined && Object.keys(PLACE_ORDER_DROPDOWN).length > 0){
+										Object.keys(PLACE_ORDER_DROPDOWN).map(option=>{
+											var checked	=	(option == ORDER_BY_RESTAURANT) ? 'checked' : '';
+											%>
+											<input id="<%=option%>" name="type"  class="with-gap" type="radio" value="<%=option%>" <%= checked%>>
+											<label for="<%=option%>"><%= (PLACE_ORDER_DROPDOWN[option]) ? PLACE_ORDER_DROPDOWN[option] :""; %></label>
+									<% 	});
+									} %>
+								</div>
+								<span id="type_error" class="error"></span>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6 rest_input">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="restaurant_name" class="control-label col-555">
+											<%= __("admin.orders.restaurant_name"); %>
+										</label>
+										<input type="text" id="restaurant_name" class="form-control" name="restaurant_name" />
+									</div>
+								</div>
+							</div>
+							<div class="col-sm-6 hide item_input">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="item_name" class="control-label col-555">
+											<%= __("admin.orders.item_name"); %>
+										</label>
+										<input type="text" id="item_name" class="form-control" name="item_name" />
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="place-order-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.search"); %>
+						</button>
+						<button type="button" class="btn bg-blue-grey btn-sm waves-effect col-white close_address" data-dismiss="modal" aria-hidden="true">
+							 <%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	/**
+	* To show restaurant name/item name
+	*/
+	$('input:radio[name="type"]').change(function() {
+		if ($(this).val() == '<%= ORDER_BY_RESTAURANT%>') {
+            $('.rest_input').removeClass('hide');
+            $('.item_input').addClass('hide');
+        } else {
+           $('.item_input').removeClass('hide');
+           $('.rest_input').addClass('hide');
+        }
+	});
+	
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+	
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('place-order',function(status,response){ 
+			if(typeof response !== 'object'){
+				$('#form_modal').html(response);
+			}
+			stopTextLoading(btnId);
+		});
+	});
+
+</script>

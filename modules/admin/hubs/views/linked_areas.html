@@ -1,0 +1,158 @@
+<div class="row clearfix" >
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="body" id="loading">
+                <table  class="row-border hover table table-bordered" cellspacing="0" width="100%"> <%
+                    if(branch_list && branch_list.length >0){
+                        branch_list.map((val,index)=>{ %>
+                            <tr>
+                                <td>
+                                    <form id="upload-area-<%=index%>" action="" enctype="multipart/form-data" data-submit-btn-id="parameters-edit-btn-id" method="post" class="freezed_event" role="form">
+                                        <div class="row clearfix">
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <div class="form-line">
+                                                        <label for="unassigned_order" class="control-label">
+                                                            <%= val.name[DEFAULT_LANGUAGE_CODE]%>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" id="branch_id_<%=index%>" class="form-control branch_id_field" name="branch_id" value="<%=val._id%>" />
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <div class="form-lin no-bottom-border" data-branch-index="<%=index%>">
+                                                        <input name="upload_file" id="upload_file_field_<%=index%>" data-index="<%=index%>" type="file" data-text="<%=__('admin.hubs.select_file')%>" data-input="false" class="form-control upload_file cfilestyle" value=""/>
+
+                                                        <span class='tooltipShow tooltipHelp brand-tooltip' title="" data-html="true" data-toggle="tooltip"  data-original-title="<%= __('admin.system.extension',ALLOWED_AREAS_MANAGER_EXTENSIONS.join(', '))%>">
+                                                            <i class="material-icons">info</i>
+                                                        </span>
+                                                        <div id="linked_areas_<%=index%>"></div>
+                                                    </div>
+                                                    <span id="upload_file_<%=index%>_error" class="error"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <div class="form-line">
+                                                        <a href="<%=admin_list_url+'/export_linked_areas/'+hub_id+'/'+val._id%>" class="<%= getPermissionClass(module_type,['hubs','view']); %>">
+                                                            <button type="button" class="btn bg-blue waves-effect">
+                                                                <%= __("admin.import_managers.download");%>
+                                                            </button>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <div class="text-center">
+                                                        <input class="with-gap"  type="radio" data-index="<%=index%>" name="no_of_unassigned_status" id="unassigned_on_<%=index%>" <%=val.status == ON ? 'checked' : ''%> value="<%=ON%>" />
+                                                        <label for="unassigned_on_<%=index%>"><%= HUB_PARAMETER_DROPDOWN[ON] %></label>
+                                                        <input class="with-gap"  type="radio" data-index="<%=index%>" name="no_of_unassigned_status" id="unassigned_off_<%=index%>"  <%=(val.status != ON) ? 'checked' : "" %> value="<%=OFF%>" />
+                                                        <label for="unassigned_off_<%=index%>"><%= HUB_PARAMETER_DROPDOWN[OFF] %></label>
+                                                    </div>
+                                                    <div id="linked_areas_on_off"></div>
+                                                    <span id="no_of_unassigned_status_<%=index%>_error" class="error"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr> <%
+                        });
+                    }else{%>
+                        <tr>
+                            <td>
+                                <%= __("admin.system.no_record_found");%>
+                            </td>
+                        </tr> <%
+                    }%>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+        customFileStyle();
+
+        /* Function for save file data*/
+        $(document).on('change','.upload_file',function(){
+            var indexPosition   = $(this).data('index');
+            var formData        = new FormData($("#upload-area-"+indexPosition)[0]);
+
+            $("#linked_areas_"+indexPosition).html('<div class="text-center col-sm-6"><img src="<%= WEBSITE_ADMIN_IMG_URL%>pagination_loader.gif" /></div>');
+            $.ajax({
+                url        : '<%= admin_list_url%>/linked_areas/<%=hub_id%>',
+                type       : 'POST',
+                data       : formData,
+                processData: false,
+                contentType: false,
+                beforeSend: function(){
+                    $("input").prop('disabled', true);
+                },
+                complete: function(){
+                    $("input").prop('disabled', false);
+                },
+                success: function(response){
+                    if(response.status && response.message) notice(response.status,response.message);
+                    if(response && response.status){
+                        $("#linked_areas_"+indexPosition).html('');
+                        $("#upload_file").val(null);
+                        $(".count-jfilestyle").addClass("hide");
+                    }
+                }
+            });
+        });
+
+        /*Function for update status*/
+        $("input[name='no_of_unassigned_status']").change(function(){
+            var indexPosition   = $(this).data('index');
+            var statusVal       = $(this).val();
+            var branchId        = $("#branch_id_"+indexPosition).val();
+            var onVal           = '<%=ON%>';
+            /** Confirm  box  You want to enable the linked area option in auto-assignment process for the branch. **/
+
+            let confirmMessage = (statusVal == onVal)? '<%= __("admin.hub.do_you_want_to_enable_ auto_assignment_process_for_the_branch"); %>':'<%= __("admin.hub.do_you_want_to_disable_ auto_assignment_process_for_the_branch"); %>' ;
+
+            confirmBox("warning",'<%= __("system.are_you_sure") %>',confirmMessage,function(result){
+                if(result){
+                    $("#linked_areas_on_off").html('<div class="text-center col-sm-12"><img src="<%= WEBSITE_ADMIN_IMG_URL%>pagination_loader.gif" /></div>');
+                    $.ajax({
+                    url        : '<%= admin_list_url%>/update_linked_areas_status',
+                    type       : 'POST',
+                    data       : {branch_id: branchId,status : statusVal, hub_id: '<%=hub_id%>' },
+                    success: function(response){
+                            if(response.status == "<%=STATUS_SUCCESS%>"){
+                                notice(response.status,response.message);
+                                swal.close();
+                            }else{
+                                if(statusVal == '<%=ON%>'){
+                                    $("#unassigned_on_"+indexPosition).removeAttr('checked');
+                                    $('#unassigned_off_'+indexPosition).prop('checked', true);
+                                }else{
+                                    $("#unassigned_on_"+indexPosition).prop('checked',true);
+                                    $('#unassigned_off_'+indexPosition).removeAttr('checked');
+                                }
+                                notice(response.status,response.message);
+                                swal.close();
+                            }
+                            $("#linked_areas_on_off").html('');
+                        }
+                    });
+                }else{
+                    if(statusVal == '<%=ON%>'){
+                        $("#unassigned_on_"+indexPosition).removeAttr('checked');
+                        $('#unassigned_off_'+indexPosition).prop('checked', true);
+                    }else{
+                        $("#unassigned_on_"+indexPosition).prop('checked',true);
+                        $('#unassigned_off_'+indexPosition).removeAttr('checked');
+                    }
+                    return false;
+                }
+            });
+        });
+    });
+</script>
+

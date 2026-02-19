@@ -1,0 +1,89 @@
+<%
+	var branchList  = (typeof branch_list !== typeof undefined && branch_list) ? branch_list :"";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-transfer" action="<%= list_url+'/branch_transfer/'+branch_id%>" data-modal-id="form_modal" data-submit-btn-id="transfer-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("branch.branch_transfer"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="branch_id" class="control-label">
+											<%= __("branch.branch"); %><span class="required"> *</span>
+										</label>
+										<select name="branch_id" id="branch_id" class="form-control show-tick" data-live-search="true">
+											<option value=""> <%=__("branch.select_branch")%> </option>
+											<%-branchList%>
+										</select>
+									</div>
+									<span id="branch_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="calendar_from" class="control-label">
+											<%= __("branch.calendar_from"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="calendar_from" name="calendar_from"  class="form-control time" placeholder="<%= __('branch.calendar_from')%>" value="<%= (from) ? newDate(from,DATABASE_DATE_TIME_FORMAT) : ''%>" readonly/>
+									</div>
+									<span id="calendar_from_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-4">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="calendar_to" class="control-label">
+											<%= __("branch.calendar_to"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="calendar_to" name="calendar_to"  class="form-control time" placeholder="<%= __('branch.calendar_to')%>" value="<%= (to) ? newDate(to,DATABASE_DATE_TIME_FORMAT) : ''%>" readonly/>
+									</div>
+									<span id="calendar_to_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="transfer-add-btn-id" class="btn bg-brown btn-sm waves-effect transfer-add-btn-submit" <%- ADMIN_LOADING_TEXT %> > <%= __("system.submit"); %></button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+
+	/**
+	 * Function to submit form
+	 */
+	$('.transfer-add-btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-transfer',function(status,response){
+			if(status){
+				window.location.reload();
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+	
+	/** For tiime picker **/
+	$('.time').datetimepicker({
+		format			: '<%=DATE_RANGE_DISPLAY_FORMAT_FOR_START_DATE%>',
+		ignoreReadonly	: true,
+		minDate 		: moment().millisecond(0).second(0).minute(0).hour(0)
+	});
+
+	$(".show-tick").selectpicker('refresh');
+</script>

@@ -1,0 +1,225 @@
+<%
+ var hubId		=	(hub_id)	?	hub_id	:hub_id;
+ var branchId   =   (branch_id) ?   branch_id : branch_id;
+%>
+<div class="row clearfix" >
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="body">
+                <form id="orders-edit" action="<%= admin_list_url+'/order_slabs/'+hubId+'/'+branchId %>" data-submit-btn-id="orders-edit-btn-id" method="post" class="freezed_event" role="form">
+                    <div class="row clearfix">
+                        <div class="col-sm-10">
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <%
+                                        Object.keys(HUB_PARAMETER_DROPDOWN).map(orderStatus=>{
+                                        var selected = (orderStatus == OFF) ? "checked" : "";
+                                        if(result && result.status) selected = (orderStatus == result.status) ? "checked" : "";
+                                    %>
+                                        <input id="<%=orderStatus%>" name="order_status"  class="with-gap" type="radio" value="<%=orderStatus%>" <%=selected%>>
+                                        <label for="<%=orderStatus%>"><%= HUB_PARAMETER_DROPDOWN[orderStatus] %></label>
+                                    <% 	});%>
+                                </div>
+                                <span id="order_status_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-3">
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="min_distance" class="control-label">
+                                        <%= __("admin.hubs.min_distance"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="max_distance" class="control-label">
+                                        <%= __("admin.hubs.max_distance"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="first_order" class="control-label">
+                                        <%= __("admin.hubs.around_first_order"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="first_order_min_dis" class="form-control" name="first_order_min" value="<%= (result!=undefined && result.first_order && result.first_order.min) ? result.first_order.min : '' %>" />
+                                </div>
+                                <span id="first_order_min_error" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="first_order_max_dis" class="form-control" name="first_order_max" value="<%= (result!=undefined && result.first_order && result.first_order.max) ? result.first_order.max : '' %>" />
+                                </div>
+                                <span id="first_order_max_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="second_order" class="control-label">
+                                        <%= __("admin.hubs.around_second_order"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="second_order_min_dis" class="form-control" name="second_order_min" value="<%= (result!=undefined && result.second_order && result.second_order.min) ? result.second_order.min : '' %>" />
+                                </div>
+                                <span id="second_order_min_error" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="second_order_max_dis" class="form-control" name="second_order_max" value="<%= (result!=undefined && result.second_order && result.second_order.max) ? result.second_order.max : '' %>" />
+                                </div>
+                                <span id="second_order_max_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="third_order" class="control-label">
+                                        <%= __("admin.hubs.around_third_order"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="third_order_min_dis" class="form-control" name="third_order_min" value="<%= (result!=undefined && result.third_order && result.third_order.min) ? result.third_order.min : '' %>" />
+                                </div>
+                                <span id="third_order_min_error" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="third_order_max_dis" class="form-control" name="third_order_max" value="<%= (result!=undefined && result.third_order && result.third_order.max) ? result.third_order.max : '' %>" />
+                                </div>
+                                <span id="third_order_max_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="fourth_order" class="control-label">
+                                        <%= __("admin.hubs.around_fourth_order_and_above"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="fourth_order_min_dis" class="form-control" name="fourth_order_min" value="<%= (result!=undefined && result.fourth_order_and_above && result.fourth_order_and_above.min) ? result.fourth_order_and_above.min : '' %>"  />
+                                </div>
+                                <span id="fourth_order_min_error" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="fourth_order_max_dis" class="form-control" name="fourth_order_max" value="<%= (result!=undefined && result.fourth_order_and_above && result.fourth_order_and_above.max) ? result.fourth_order_and_above.max : '' %>"  />
+                                </div>
+                                <span id="fourth_order_max_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="assigned_buffer_time" class="control-label">
+                                        <%= __("admin.hubs.exceeding_order_slabs"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="exceeding_order_slabs" class="form-control" name="exceeding_order_slabs" value="<%= result!=undefined ? result.exceeding_order_slab : '' %>" />
+                                </div>
+                                <span id="exceeding_order_slabs_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="max_exceeding_order_slabs" class="control-label">
+                                        <%= __("admin.hubs.max_exceeding_order_slabs"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="max_exceeding_order_slabs" class="form-control" name="max_exceeding_order_slabs" value="<%= result!=undefined ? result.max_exceeding_order_slab : '' %>" />
+                                </div>
+                                <span id="max_exceeding_order_slabs_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--  submit btn html -->
+                    <button type="button" id="orders-edit-btn-id" class="btn bg-brown btn-sm waves-effect freezed_event orders-btn-submit" <%- ADMIN_LOADING_TEXT %> >
+						<%= __("admin.system.submit"); %>
+					</button>
+                    <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.orders-btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('orders-edit',function(status,response){
+			if(status){
+                $("#orders-edit span.error").html("");
+				notice("success",response.message);
+                stopTextLoading(btnId);
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+    /** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+</script>

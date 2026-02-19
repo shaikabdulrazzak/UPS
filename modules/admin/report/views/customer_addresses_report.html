@@ -1,0 +1,169 @@
+<% let addressLimit = address_limit; %>
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by customer name -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="full_name" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.report.search_by_customer_name'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- Search by mobile number -->
+									<div class="col-xs-12 col-sm-3">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" name="mobile_number" id="mobile_number" placeholder="<%= __('admin.report.search_by_customer_mobile'); %>">
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-4">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="card">
+				<div class="header">
+					<h2>
+						<%=  __("admin.report.customer_addresss_report"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm <%= getPermissionClass(module_type,['customer_addresss_report','export']); %>">
+						<li>
+							<a href="<%=admin_list_url%>/customer_address/export_data/<%=export_count%>">
+								<button type="button" class="btn btn-sm bg-green waves-effect">
+									<%= __("admin.report.export")%>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="body">
+					<table id="datatable-listing" class="row-border full-length-header hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+						<thead>
+							<tr>
+								<th><%= __('admin.report.customer_name'); %></th>
+								<th><%= __('admin.report.mobile_number'); %></th>
+								<th><%= __('admin.report.secondary_mobile_number'); %></th>
+								<% for(var i=1; i <= addressLimit; i++) { %>
+								    <th ><%= __('admin.report.address',i); %></th>
+								<% } %>
+							</tr>
+						</thead>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		/** Function to initialize datatable and get server side data*/
+		var dataTable		 =	"";
+		var addressLimit	 =	parseInt("<%=addressLimit%>");
+		$(document).ready(function() {
+			/** Manage table columns */
+			var addColumns = [
+				{   "data"       : "full_name",
+					"serachable" : false,
+					"orderable"  : false
+				},
+				{   "data"       : "mobile_number",
+					"serachable" : false,
+					"orderable"  : false
+				},
+				{   "data"       : "cust_tele2",
+					"serachable" : false,
+					"orderable"  : false
+				}
+			];
+
+			<% for(var i=0; i < addressLimit; i++) { %>
+				addColumns.push({
+					"data"       : "addresses_list",
+					"serachable" : false,
+					"orderable"  : false,
+					"render"	 : function(result){
+						var tmpAddDetails  = (result && result[<%=i%>]) ? result[<%=i%>] :"";
+						var html = "";
+						if(tmpAddDetails){
+							html  = "<%=__('admin.customer_address_report.area')%>- "+((tmpAddDetails.area_name) 			?	tmpAddDetails.area_name			:'N/A');
+							html += "<br/><%=__('admin.customer_address_report.block')%>- "+((tmpAddDetails.area_block_name) ? 	tmpAddDetails.area_block_name	:'N/A');
+							html += "<br/><%=__('admin.customer_address_report.street')%>- "+((tmpAddDetails.building_number)? 	tmpAddDetails.building_number	:'N/A');
+							html +=	"<br/><%=__('admin.customer_address_report.building')%>- "+((tmpAddDetails.street) 		? 	tmpAddDetails.street			:'N/A');
+						}
+
+						return html;
+					}
+				});
+			<% } %>
+
+			dataTable = $("#datatable-listing").DataTable({
+				"bStateSave"	: true,
+				"fnStateSave"	: function (oSettings, oData) {
+					localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+				},
+				"fnStateLoad"	: function (oSettings) {
+					return JSON.parse( localStorage.getItem('DataTables') );
+				},
+				"order"		: 	[],
+				"sDom"		:	"ltipr",
+				"serverSide": 	true,
+				"scrollX"	: 	true,
+				"lengthMenu":	PAGING_LENGTH_MENU,
+				"columns"	:   addColumns,
+				"ajax":{
+					url 	: "<%=admin_list_url%>/customer_address",
+					type	: "POST",
+					data    : function(d){
+						d.mobile_number =	$('#mobile_number').val();
+						d.export_count =	"<%=export_count%>";
+					},
+					dataSrc	: function(res){
+						return res.data;
+					}
+				}
+			});
+		});
+
+		$("#mobile_number").keyup(function(){
+			dataTable.draw()
+		});
+
+		/** Javascript function to search datatable */
+		function searchDatatable(columnNumber){
+			var query= $('#column_filter_'+columnNumber).val();
+			dataTable.column(columnNumber).search(query).draw()
+		}//end searchDatatable()
+	</script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

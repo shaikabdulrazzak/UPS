@@ -1,0 +1,127 @@
+<%
+	var result 		= (typeof result !== typeof undefined && result) ?	result :{};
+	var isEditable 	= is_editable;
+	var areaId 		= result._id;
+	var formUrl 	= (result && isEditable) ? admin_list_url+"/edit/"+areaId : admin_list_url+"/add";
+	var fromDate	= (result.date) ? newDate(result.date,DATABASE_DATE_FORMAT) : newDate("",DATABASE_DATE_FORMAT);
+	var toDate		= (result.date) ? newDate(result.date,DATABASE_DATE_FORMAT) : newDate("",DATABASE_DATE_FORMAT);
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form data-modal-id="form_modal" id="add-area" data-submit-btn-id="area-add-btn-id" method="post" action="<%=formUrl%>" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%=  __("admin.fleet_zone_assignment.assign_zone"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="user_name" class="control-label">
+											<%= __("admin.fleet_zone_assignment.user_name"); %><span class="required"> *</span>
+										</label>
+										<select id="user_name" class="form-control show-tick" name="user_name"  data-live-search="true" data-title='<%=__("admin.fleet_zone_assignment.select_team_member")%>' multiple>
+											<%-users_list%>
+										</select>
+									</div>
+									<span id="user_name_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="date" class="control-label">
+											<%=  __('admin.fleet_zone_assignment.date'); %><span class="required"> *</span>
+										</label>
+										<input class="form-control" id="area-date-range-picker" value="<%=fromDate+' - '+toDate%>">
+									</div>
+									<input class="form-control hide" id="area_from_date" type="text" name="from_date" value="<%=fromDate%>">
+									<input class="form-control hide" id="area_to_date" type="text" name="to_date" value="<%=toDate%>">
+									<span id="date_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="zone_id" class="control-label">
+											<%=  __('admin.fleet_zone_assignment.zone'); %><span class="required"> *</span>
+										</label>
+										<select id="zone_id" class="form-control show-tick" name="zone_id"  data-live-search="true" data-title="<%- __('admin.fleet_zone_assignment.select_zone')%>" multiple>
+											<%-zones%>
+										</select>
+									</div>
+									<span id="zone_id_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-2 m-t-25 ">
+								<button type="button" id="select_all_zones" class="btn bg-brown btn-sm waves-effect col-white ">
+									<%= __("admin.fleet_zone_assignment.select_all"); %>
+								</button>
+							</div>
+							<div class="col-sm-1 m-t-25 pl-0">
+								<button type="button" id="unselect_all_zones" class="btn bg-pink btn-sm waves-effect col-white "><%= __("admin.fleet_zone_assignment.unselect_all");%>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="area-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+
+	$(".show-tick").selectpicker('refresh');
+
+	$(document).ready(function(){
+		/*
+		 *	Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('add-area',function(status,response){
+				if(status){
+					$('#form_modal').modal("hide");
+					if(response.status && response.message) notice(response.status,response.message);
+					getListing();
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	});
+	/**
+	 * Function for date range picker
+	 */
+	var fromDateInput 	= '#area_from_date';
+	var toDateInput 	= '#area_to_date';
+	var datePickerInput = '#area-date-range-picker';
+	var stopTableDraw   = true;
+	var minDate			= new Date();
+	$(document).ready(function(){
+		initDateRangePicker();
+	});
+
+	/** Select all zone list */
+	$('#select_all_zones').click(function(){
+		$('#zone_id').selectpicker('selectAll');
+	});
+
+	/** unselect all zone list */
+	$('#unselect_all_zones').click(function(){
+		$('#zone_id').val("").selectpicker('refresh');
+	});
+</script>

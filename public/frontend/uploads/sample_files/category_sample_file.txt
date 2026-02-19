@@ -1,0 +1,4 @@
+Category Old Id~Cuisine Id~Category English Name~Category Arabic Name~Category Display Order~Active Status
+456789~1~Category name in english~Category name in arabic~1~1
+456789~2~Category name in english 1~Category name in arabic 1~2~1
+456789~4~Category name in english 2~Category name in arabic 2~3~1

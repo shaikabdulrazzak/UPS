@@ -1,0 +1,154 @@
+/*Dashboard-page-css-start*/
+/*Header-Css-Start*/
+.maindiv{padding: 66px 0 0 80px; position:relative; height:100%; width:100%;}
+header {padding: 0 20px 0px 0;position: fixed;top: 0;left: 0;right: 0;background-color: #522979;font-size: 0; z-index:9;}
+.header_left {display: inline-block;width: 50%;font-size: 14px;vertical-align: middle;}
+.header_right {display: inline-block;width: 50%;font-size: 14px;text-align: right;vertical-align: middle;}
+.user_profile a.dropdown-toggle {text-decoration: none;color: #fff;text-transform: capitalize;font-size: 14px;vertical-align: middle;white-space: nowrap;text-overflow: ellipsis;display: inline-block;max-width: 120px;overflow: hidden;}
+.user_profile a.dropdown-toggle img {margin-right: 6px;}
+.user_profile .dropdown-menu.show {display: block;left: auto !important;top: 47px !important;min-width: 188px;right: 0;padding-bottom: 0;}
+.user_profile .dropdown-menu a figure {vertical-align: middle;margin: -5px 10px 0 0;display: inline-block;}
+.emai_profile a figure {display: inline-block;width: 33px;border: 1px solid #d5d5d5;border-radius: 50%;height: 33px;overflow: hidden;margin: 0;}
+.mail_adrss {display: inline-block;width: 115px;vertical-align: middle;}
+.mail_adrss span {display: block;line-height: normal;font-size: 14px; color:#000;}
+.mail_adrss small {display: block;line-height: normal;}
+.emai_profile a {color: #000;text-decoration: none;font-size: 14px;}
+.user_profile .dropdown-menu a.dropdown-item {padding: 12px 12px;border-bottom: 1px solid #ddd; font-size:14px;}
+.user_profile .dropdown-menu a.dropdown-item:last-child{ border-bottom:none;}
+.emai_profile {display: block;padding: 6px 10px 20px;}
+.user_profile {display: inline-block;}
+.search_bar .form-control {padding: 6px 20px 6px 35px;font-size: 14px;width: 188px;height: 36px; border:1px solid #AEAEAE; box-shadow:none;}
+.search_bar a {position: absolute;left:10px; top:7px;}
+.search_bar {display: inline-block;position: relative;margin-left: 15px;}
+/*Header-Css-Start-End*/
+
+/*Left-menu-bar-css-start*/
+.left_menu ul{ padding-top:15px; padding-bottom:25px; height:100%;}
+.left_menu ul li {display: block;text-align: center;}
+.left_menu ul li a{ display:block;padding: 20px 20px 20px 20px;}
+.left_menu ul li a:hover{ background-color:#522978;}
+.left_menu ul li.active a {background-color: #f0f3f8;border-left: 4px solid #522978;}
+.left_menu ul li.active a:hover{ background-color:#522978;}
+.left_menu {position: fixed;left: 0;top: 0;background-color: #fff;height: 100%;width: 80px;overflow: hidden; z-index:99;margin-top: 68px;}
+.logo{padding: 25px 14px 20px 15px; background-color:#522978; display:inline-block;}
+.logo figure{ margin:0;}
+.left_menu ul li a .hover_show {display: none;}
+.left_menu ul li a:hover img {display: none;}
+.left_menu ul li a:hover .hover_show{ display:inline-block;}
+.left_menu .mCSB_inside > .mCSB_container{ margin-right:0;}
+
+/*Left-menu-bar-css-End*/
+
+.equal_spacing {padding: 20px;}
+.dashboard_page h1 {font-size: 20px;font-weight: 600;margin: 0 0 20px;font-family: 'Roboto', sans-serif;}
+.total_content span {display: block;font-size: 15px; color:#454545;}
+.total_content strong {display: block;font-size: 32px; color:#252d42;line-height: normal; font-weight:700;}
+.total_content small { color:#7bd31d;display: block;}
+.total_content figure {margin: 0;display: block;text-align: right;}
+.total_content {background-color: #fff;padding: 10px;display: block;border-radius: 5px;box-shadow: 0px 2px 6px 1px rgba(0,0,0,0.05); -webkit-box-shadow: 0px 2px 6px 1px rgba(0,0,0,0.05);}
+.total_detail ul li {display: inline-block;width: 16.66%;padding: 0 6px; font-size:14px;vertical-align: top;}
+.total_detail ul {margin: 0 -6px;font-size: 0;}
+.total_detail ul li:hover .total_content{ background-color:#f8f8f8;}
+.total_content strong small {display: inline-block;font-size: 24px;color: #252d42;font-weight: 600;vertical-align: top;}
+.total_content .redtext{ color:#eb0f0f;}
+
+.heading_text h3 {margin: 0;font-size: 16px;font-weight: 600;font-family: 'Roboto', sans-serif;}
+.sales_report {background-color: #fff;border-radius: 7px;display: block;}
+.separate_box {margin: 20px 0 0;font-size: 0;}
+.order_status {background-color: #fff;border-radius: 7px;display: block;}
+.white_bg_left {display: inline-block;width: 70%;padding: 0 7px 0 0;}
+.white_bg_right {vertical-align: top;width: 30%;display: inline-block;font-size: 14px;padding: 0 0 0 7px;}
+.sales_report figure img {width: 100%;}
+.order_status figure img {width: 100%;}
+
+.status_box {display: inline-block;font-size: 14px;}
+.status_box {box-shadow: 0px 2px 6px 1px rgba(0,0,0,0.05); -webkit-box-shadow: 0px 2px 6px 1px rgba(0,0,0,0.05);display: block;font-size: 14px;background-color: #fff;border-radius: 7px;padding: 15px;width: 100%; margin-bottom:20px;}
+.captains_left small {height: 10px;width: 10px;display: inline-block;border-radius: 50%;}
+.bluedots {background-color: #5351fa;}
+.greenedots{background-color: #03cb9a;}
+.yellowdots{background-color: #f6b900;}
+.reddots{background-color: #f73f00;}
+
+.captains_detail li{padding:0px 0 1px 0; display:block; font-size:0;}
+.captains_detail li div.online_payment{font-size:14px; padding:0 0 0 50px; position:relative;}
+.captains_detail li div.online_payment:after{position:absolute; content:""; left:30px; top:11px; height:2px; width:10px; background-color:#5f5f5f;}
+.captains_left span {font-size: 14px;padding: 0 0 0 10px;display: inline-block;}
+.captains_right {display: inline-block;width: 40%;font-size: 14px;text-align: right;}
+.captains_left {display: inline-block;width: 60%;font-size: 14px;}
+.status_box .heading_text {display: block;padding: 0 0 20px;}
+.client_status li figure {vertical-align: middle;margin: 0;display: inline-block;background-color: #d9f2ec;height: 60px;line-height: 60px;width: 60px;text-align: center;border-radius: 50%;}
+.client_status li figure.red_bg{background-color: #f3e0da;}
+.client_status li {display: inline-block;width: 50%;font-size: 14px; padding-bottom:10px;}
+.client_status {padding: 0 0 8px;font-size: 0;}
+.client_status_content {display: inline-block;vertical-align: middle;padding: 0 0 0 10px;}
+.client_status_content strong {font-size: 24px;}
+.client_status_content strong span {display: block;font-weight: normal;font-size: 15px;line-height: normal;}
+.status_detail { vertical-align:top;display: inline-block;width: 33.33%;padding: 0 7px;}
+.status_section {margin: 0 -7px;}
+.delivery_status .captains_left strong span { font-weight:normal;font-size: 17px;display: block;padding: 0;}
+.delivery_status .captains_left strong {display: inline-block; font-size:24px;width: 59%;}
+.delivery_status .captains_left {width: 100%;}
+.delivery_status .captains_left small {font-size: 16px;display: inline-block;height: auto;width: 40%;padding: 20px 0 0px;text-align: right;}
+.progress_bar .progress-bar {background-color: #01cd98;}
+.progress_bar .progress{ height:5px;}
+.progress_bar {padding: 20px 0 0;}
+.orange_progress .progress-bar {background-color: #f64000;}
+.blue_progress .progress-bar {background-color: #7e7eee;}
+.captains_detail.delivery_status li {padding:18px 0;}
+.payment_status .captains_detail {display: inline-block;width: 49%;vertical-align: middle;}
+.chart_img {display: inline-block;width: 50%;text-align: right; padding-bottom:20px;}
+.payment_status .captains_left {width: 100%;}
+.chart_img figure {margin: 0;}
+.marchant_report .client_status li figure {vertical-align: middle;margin: 0;display: inline-block;background-color: transparent;height: auto;line-height: normal;text-align: center;border-radius: 50%;width: auto;}
+.marchant_report .client_status{ padding-top:5px;}
+footer ul {margin: 0 -20px;}
+footer ul li {display: inline-block;position: relative;padding: 0 20px;}
+footer ul li::after {position: absolute;right: 0;top: 6px;background-color: #bbbfc2;height: 28px;width: 1px;content: "";}
+footer ul li strong {line-height: 12px; color:#878b8e;display: block;font-weight: 600; line-height:normal;font-family: 'Roboto', sans-serif;}
+footer ul li span {color:#878b8e;font-size: 13px;}
+footer ul li:last-child:after{ display:none;}
+
+/*Dashboard-page-css-End*/
+
+@media (max-width: 767px){
+/*Dashboard-css*/
+.total_detail ul li {width: 50%;padding: 6px 6px;}
+.total_content strong {font-size: 24px;}
+
+.white_bg_left {display: block;width: 100%;padding: 0;}
+.white_bg_right {width: 100%;padding: 0;}
+.equal_height{ height:auto !important;}
+.heading_text h3 {font-size: 18px;}
+.total_detail ul {margin: 0;}
+.status_detail {display: block;width: 100%;padding: 0;}
+.status_box figure img {max-width: 100%;}
+.captains_left span {font-size: 13px;}
+.captains_right {display: block;width: 100%;text-align: left;padding: 0 0 0 23px;}
+.captains_left {display: block;width: 100%;}
+
+.mobile_show_menu {display: block;}
+.mobile_show_menu {display: block;text-align: right;padding: 0 15px 0 10px;position: absolute;right: 0;top: 22px;bottom: auto;z-index: 9;}
+header {position: relative;}
+.header_left {width: 33%;}
+.header_right {width: 67%;padding: 0 33px 0 0;}
+.maindiv{ padding:0;}
+.mobile_show_search{display:inline-block;padding: 0 10px 0 10px;}
+.search_bar{ display:none;}
+.delivery_status .captains_left small {font-size: 14px;width: 39%;}
+.delivery_status .captains_left strong {font-size: 21px;width: 59%;}
+.delivery_status .captains_left strong span {font-size: 14px;}
+
+/*Dashboard-css-end*/
+}
+
+@media (max-width: 479px){
+/*Dashboard-css*/
+.total_detail ul li{display:block; width:100%; padding:6px 0px;}
+.client_status li figure{height:50px; line-height:50px; width:50px;}
+.client_status li{width: 50%;}
+.client_status_content{padding:10px 0 0;}
+.payment_status .captains_detail{width:100%;}
+.chart_img {display: block;width:100%;text-align:center;}
+.client_status_content strong{font-size:20px;}
+
+/*Dashboard-css-end*/

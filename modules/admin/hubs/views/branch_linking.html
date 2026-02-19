@@ -1,0 +1,190 @@
+<%
+var hubId  		=  hub_id;
+%>
+<div class="container-fluid" id="main-container">
+	<!--Search Start -->
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="panel-group" id="panel-group-id" role="tablist" aria-multiselectable="true">
+				<div class="panel panel-col-pink">
+					<div class="panel-heading" role="tab" id="panel-heading-id">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-target="#panel-collapse-id" data-parent="#panel-group-id" href="javascript:void(0)" aria-expanded="false"
+							   aria-controls="panel-collapse-id">
+								<%= __("admin.system.search"); %>
+								<span class="pull-right collapse-toggle-icon"></span>
+							</a>
+						</h4>
+					</div>
+					<div id="panel-collapse-id" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="panel-heading-id">
+						<div class="panel-body">
+							<form id="searchForm" name="searchForm" >
+								<div class="row clearfix dataTables_wrapper">
+									<!-- Search by link name  -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<input class="form-control" id="column_filter_0"  onkeyup="searchDatatable(0)" placeholder="<%= __('admin.hubs.search_by_link_name'); %>" name="link_name">
+											</div>
+										</div>
+									</div>
+									<!-- Search by branch -->
+									<div class="col-xs-12 col-sm-4">
+										<div class="form-group">
+											<div class="form-line">
+												<select class="form-control show-tick branch_id " id="branch_ids" name="search_branch_id" data-live-search="true" data-title="<%=__('admin.hubs.search_by_branch')%>"  multiple>
+													<%-branch_list%>
+												</select>
+											</div>
+										</div>
+									</div>
+									<!-- reset button -->
+									<div class="col-sm-2">
+										<button type="button" id="reset" class="btn btn-sm waves-effect btn-danger">
+											<%= __("admin.system.reset")%>
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--Search End -->
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="card">
+			<div class="header">
+				<h2>
+					<%= __("admin.hubs.branch_linking"); %>
+				</h2>
+				<ul class="header-dropdown m-r--5 btn-right-top-margin  visible-md visible-lg visible-sm">
+					<li>
+						<a href="javascript:void(0);" data-href="<%=admin_list_url%>/add_branch_linking/<%= hubId %>" class="open-modal <%= getPermissionClass(module_type,['hubs','view']); %>">
+							<button type="button" class="btn btn-sm bg-indigo waves-effect">
+								<%= __("admin.hubs.add_link"); %>
+							</button>
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="body">
+				<table id="datatable-branch-link-listing" class="row-border hover table table-bordered cb-data-table" cellspacing="0" width="100%">
+					<thead>
+						<tr>
+							<th width="20%"><%= __("admin.hubs.link_name"); %></th>
+							<th width="20%"><%= __("admin.hubs.branch_name"); %></th>
+							<th width="20%"><%= __("admin.system.action"); %></th>
+						</tr>
+					</thead>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal for view customer details -->
+<div class="modal fade" id="branch_link" tabindex="-1" role="dialog" aria-labelledby="branch_link" aria-hidden="true">
+</div><!--modal close-->
+
+<script type="text/javascript">
+/** Function to initialize datatable and get server side data*/
+var dataTable ="";
+	$(document).ready(function() {
+		dataTable 	= 	$('#datatable-branch-link-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem('DataTables', JSON.stringify(oData));
+			},
+			"fnStateLoad"	: function (oSettings) {
+				return JSON.parse(localStorage.getItem('DataTables'));
+			},
+			"order"		: 	[[0, "desc"]],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":   PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{
+					"data" 		: 'name',
+					"field_name": "name.<%=DEFAULT_LANGUAGE_CODE%>",
+					"render" 	: function(result){
+						return (result) ? result['<%=DEFAULT_LANGUAGE_CODE%>'] :"";
+					}
+				},
+				{
+					"data" 		: 'branch_list',
+					"orderable" : false,
+					"render" 	: function(result){
+						return (result) ? "<span class='readmore'>"+result.join(', ')+"</span>" :"N/A";
+					}
+				},
+				{
+					"data"			: {},
+					"orderable"		: false,
+					"searchable"	: false,
+					"render" 		: function(result){
+						var id = (result._id) ? result._id 	:"";
+
+						var dropDownButton 		=	'<a href="javascript:void(0);" data-href="<%=admin_list_url%>/add_branch_linking/<%= hubId%>/'+id+'" class="btn bg-indigo waves-effect ml-5 m-t-5 open-modal <%= getPermissionClass(module_type,["hubs","edit_link"]); %>"><%= __("admin.system.edit"); %></a>';
+
+						dropDownButton 		+=	'<a href="javascript:void(0)" data-href="<%=admin_list_url%>/delete_link/<%= hubId%>/'+id+'" class="btn bg-indigo waves-effect ml-5 m-t-5 waves-effect m-l-5 m-t-5 confirm_box <%= getPermissionClass(module_type,["hubs","delete_link"]); %>" data-confirm-message="<%= __("admin.hubs.do_you_want_to_delete_this_link"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>">'+
+								''+'<%= __("admin.system.delete"); %>'+'</a>'
+
+
+						return dropDownButton;
+					}
+				}
+			],
+			"ajax":{
+				url 	: "<%=admin_list_url%>/branch_linking/"+'<%= hub_id %>',
+				type	: "POST",
+				data : 	function (d) {
+					d.branch_ids  =	$('#branch_ids').val();
+				},
+				dataSrc	: function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+			},
+			"drawCallback": function( settings ) {
+				/** Description read more **/
+				readMore();
+			}
+		});
+	});
+	/**
+	* Function to show link modal
+	*/
+	$(document).on('click','.open-modal',function(){
+		var url	=	$(this).attr('data-href');
+		$.ajax({
+			url :url,
+			type: "GET",
+			success:function(response){
+				$('#change_address').modal({
+					backdrop: 'static',
+					keyboard: false
+				});
+				$('#branch_link').html(response);
+				$('#branch_link').modal('show');
+			}
+		});
+	});
+
+	$("#branch_ids").change(function(){
+		dataTable.draw();
+	});
+
+	/** Javascript function to search datatable */
+	function searchDatatable(columnNumber){
+		var query= $('#column_filter_'+columnNumber).val();
+		dataTable.column(columnNumber).search(query).draw()
+	}//end searchDatatable()
+
+	 /** Refresh bootstrap select box  **/
+	 $(".show-tick").selectpicker('refresh');
+</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+

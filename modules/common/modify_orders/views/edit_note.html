@@ -1,0 +1,73 @@
+
+<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<form id="edit-note" action="<%=list_url%>/edit_note/<%=cart_id%>" data-submit-btn-id="edit-note-add-btn-id" method="post" class="on_click_submit" role="form">
+				<div class="modal-dialog  modal-md" role="document">
+					<div class="modal-content">
+						<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+							<h2 class="modal-title">
+								<%=__("admin.place_order.edit_note"); %>
+								<span class="cursor-pointer modal-close pull-right" data-dismiss="modal"><i class="material-icons">close</i></span>
+							</h2>
+						</div>
+						<div class="modal-body padding-20">
+							<div class="row clearfix selected">
+								<div class="col-sm-12">
+									<div class="form-group">
+										<div class="form-line">
+											<label for="note" class="control-label col-555">
+												<%= __("admin.place_order.note"); %><span class="required"></span>
+											</label>
+											<textarea id="note" class="form-control resize-none height-100 notSubmitOnEnter" rows="5"
+												name="note"><%= (result.note) ? result.note :''; %></textarea>
+										</div>
+										<span id="note_error" class="error"></span>
+									</div>
+								</div>
+                                <input type="hidden" id="user_id" class="form-control" name="user_id" value="<%= (user_id) ? user_id :'';%>" />
+        						<input type="hidden" id="address_id" class="form-control" name="address_id" value="<%= (address_id) ? address_id :'';%>" />
+		        				<input type="hidden" id="area_id" class="form-control" name="area_id" value="<%= (area_id) ? area_id :'';%>" />
+						        <input type="hidden" id="restaurant_id" class="form-control" name="restaurant_id" value="<%= (restaurant_id) ? restaurant_id :'';%>" />
+        						<input type="hidden" id="delivery_by" class="form-control" name="delivery_by" value="<%= (delivery_by) ? delivery_by :'';%>" />
+		        				<input type="hidden" id="is_scheduled" class="form-control" name="is_scheduled" value="<%= (is_scheduled) ? is_scheduled :'';%>" />
+				        		<input type="hidden" id="scheduled_time" class="form-control" name="scheduled_time" value="<%= (scheduled_time) ? scheduled_time :'';%>" />
+                                <input type="hidden" id="branch_id" class="form-control" name="branch_id" value="<%= (branch_id) ? branch_id :'';%>" />
+								<input type="hidden" id="is_submit" class="form-control" name="is_submit" value="true" />
+
+							</div>
+						</div>
+						<div class="modal-footer modal-footer-seperator">
+							<button type="button" id="edit-note-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+								<%= __("admin.system.submit"); %>
+							</button>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+
+<script type="text/javascript">
+	$(document).ready(function(){
+		/**
+		 * Function to submit form
+		 */
+		$('.btn-submit').click(function(){
+			var btnId = $(this).attr('id');
+			startTextLoading(btnId);
+			ajax_submit('edit-note',function(status,response){
+				if(status){
+					if(response.status && response.message) notice(response.status,response.message);
+
+					$('#edit_note_model').modal("hide");
+					myCart();
+					setTimeout(function(){
+						$('body').addClass("modal-open");
+					},500);
+				}else{
+					stopTextLoading(btnId);
+				}
+			});
+		});
+	});
+</script>

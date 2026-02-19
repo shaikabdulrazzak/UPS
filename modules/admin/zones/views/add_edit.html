@@ -1,0 +1,121 @@
+<%
+	var result 		= 	(typeof result !== typeof undefined && result)			 	?	result 		:{};
+	var isEditable 	= 	(typeof is_editable !== typeof undefined && is_editable) 	?	is_editable :false;
+	var hubList     = 	(typeof hub_list !== typeof undefined && hub_list) 			? 	hub_list 	:"";
+	var zoneId		=	(result._id)	?	result._id	:"";
+	var formUrl 	=	(isEditable)	?	admin_list_url+"/edit/"+zoneId :admin_list_url+"/add";
+%>
+<div class="row clearfix" >
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="add-zone" action="<%=formUrl%>" data-submit-btn-id="zones-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog"  role="document">
+				<div class="modal-content">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= (isEditable) ? __("admin.zones.edit_zone") : __("admin.zones.add_zone"); %>
+						</h2>
+					</div>
+					<div class="modal-body padding-20">
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_english" class="control-label">
+											<%= __("admin.zones.name_in_english"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_english" class="form-control" name="name_english" value="<%=result.name ? result.name.en : ""%>"/>
+									</div>
+									<span id="name_english_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="name_in_arabic" class="control-label">
+											<%= __("admin.zones.name_in_arabic"); %><span class="required"> *</span>
+										</label>
+										<input type="text" id="name_in_arabic" class="form-control" name="name_arabic" value="<%=result.name ? result.name.ar : ""%>"/>
+									</div>
+									<span id="name_arabic_error" class="error"></span>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="hub_list" class="control-label">
+											<%= __("admin.zones.hubs"); %><span class="required"> *</span>
+										</label>
+										<select class="form-control show-tick hub_ids" data-title='<%= __("admin.zones.select_hubs"); %>' name="hub_ids" id="hub_ids" data-live-search="true" multiple>
+											<%-hubList%>
+										</select>
+									</div>
+									<span id="hub_ids_error" class="error"></span>
+								</div>
+							</div>
+							<div class="col-sm-2 m-t-25">
+								<button type="button" id="select_all_hubs" class="btn bg-brown btn-sm waves-effect col-white ">
+									<%= __("admin.zones.select_all"); %>
+								</button>
+							</div>
+							<div class="col-sm-2 m-t-25 m-l-25 ">
+								<button type="button" id="unselect_all_hubs" class="btn bg-pink btn-sm waves-effect col-white "><%= __("admin.zones.unselect_all");%>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="zone-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.system.submit"); %>
+						</button>
+						<button type="button" class="btn bg-pink btn-sm waves-effect col-white" data-dismiss="modal" aria-hidden="true">
+							<%= __("admin.system.cancel"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script type="text/javascript">
+	/** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+
+	/**
+	 * Function to submit form
+	 */
+	var isEditable =  <%=isEditable%>;
+
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('add-zone',function(status,response){
+			if(status){
+				if(isEditable){
+					if(typeof dataTable !== typeof undefined) dataTable.ajax.reload(null, false);
+					if(response.status && response.message) notice(response.status,response.message);
+					$('#form_modal').modal("hide");
+				}else{
+					$("#reset").trigger("click");
+				}
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/** Select all hubs list */
+	$('#select_all_hubs').click(function(){
+		$('.hub_ids').selectpicker('selectAll');
+	});
+
+	/** unselect all hubs list */
+	$('#unselect_all_hubs').click(function(){
+		$('.hub_ids').val("").selectpicker('refresh');
+	});
+
+</script>

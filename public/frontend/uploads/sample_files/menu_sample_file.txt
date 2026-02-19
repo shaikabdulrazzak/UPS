@@ -1,0 +1,5 @@
+﻿Menu Old Id~Name In English~Name In Arabic~Menu Type~Start Date~End Date~Start Time~End Time
+678900~Menu English Name 1~Menu Arabic Name 1~global~2~5~10.30~12.55
+678900~Menu English Name 2~Menu Arabic Name 2~global~4~9~12.30~15.55
+678900~Menu English Name 3~Menu Arabic Name 3~standalone~~~~~
+678900~Menu English Name 4~Menu Arabic Name 4~standalone~~~~~

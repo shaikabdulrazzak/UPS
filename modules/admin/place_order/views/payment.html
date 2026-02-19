@@ -1,0 +1,421 @@
+<%
+	var cartList 			= 	(typeof cart_data !== typeof undefined && cart_data)	?	cart_data :{};
+	let branchList			=	(cartList && cartList.result && cartList.result[0] && cartList.result[0].all_branch_list) ? cartList.result[0].all_branch_list : [];
+	var walletData 			= 	(typeof wallet_data !== typeof undefined && wallet_data)	?	wallet_data :{};
+	let	walletTotal			=	(walletData.total_amount)	 	? walletData.total_amount 	:0;
+	let	grandTotal			=	(cartList.grand_total)	 		? cartList.grand_total 		:0;
+	let	discount			=	(cartList.total_discount)	 	? cartList.total_discount 	:0;
+	let	itemSubTotal		=	(cartList.item_sub_total)	 	? cartList.item_sub_total 	:0;
+	let	simphony			=	(cartList.result && cartList.result[0] && cartList.result[0].simphony)	 		? cartList.result[0].simphony 			:false;
+	let	deliveryFees		=	(cartList.result && cartList.result[0] && cartList.result[0].delivery_fees)	 	? cartList.result[0].delivery_fees 		:0;
+	let	minimumOrderLimit	=	(cartList.result && cartList.result[0] && cartList.result[0].minimum_order_limit)? cartList.result[0].minimum_order_limit:0;
+	let sourceList			=	(typeof aghzeya_data != typeof undefined && aghzeya_data.source_list) ? aghzeya_data.source_list : [];
+	let sourcePaymentMethods=	(typeof aghzeya_data != typeof undefined && aghzeya_data.source_payment_methods) ? aghzeya_data.source_payment_methods : [];
+	let nameField = (DEFAULT_LANGUAGE_CODE == ARABIC_LANGUAGE_CODE) ? "a_name" : "e_name";
+	let isSupportSheelCard	=	false;
+	sourcePaymentMethods.map(rec=>{
+		if(rec.id == 5) isSupportSheelCard = true;
+	});
+	var outstandingOrderAmount	=	(cartList.outstanding_order_amount) ? cartList.outstanding_order_amount :0;
+	var outstandingOrderList    = 	(cartList.outstanding_order_list)	? cartList.outstanding_order_list   :[];
+	var outstandingOrderLink    =   "";
+	var totalOrderAmount 	   = grandTotal;
+	if(outstandingOrderAmount >0){
+		totalOrderAmount += outstandingOrderAmount;
+	}
+
+	if(outstandingOrderList.length >0){
+		outstandingOrderList.map((records,index)=>{
+			if(records.unique_order_id){
+				if(index >0) outstandingOrderLink += ", ";
+
+				outstandingOrderLink +=  '<a class="col-dark-gray text-decoration-none" href="'+WEBSITE_ADMIN_URL+'orders/view/'+records.order_id+'" target="_blank">'+records.unique_order_id+'</a>';
+			}
+		});
+		outstandingOrderLink = "( "+outstandingOrderLink+" )";
+	}
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<form id="place-order" action="<%= admin_list_url+'/place_order'%>" data-submit-btn-id="address-add-btn-id" method="post" class="on_click_submit" role="form">
+			<div class="modal-dialog modal-lg"  role="document">
+				<div class="modal-content payment_popup">
+					<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+						<h2 class="modal-title">
+							<%= __("admin.order_food.payment_methods"); %><span class="cursor-pointer modal-close pull-right" data-dismiss="modal"><i class="material-icons">close</i></span>
+						</h2>
+						<ul class="header-dropdown m-r--5 order_back_button">
+							<li>
+								<a href="javascript:void(0);" class="open-categories" data-action="<%= WEBSITE_ADMIN_URL+'place_order/item_list'%>"
+									>
+									<button type="button" class="btn bg-indigo btn-sm waves-effect noHover" id="back_button">
+										<%= __("admin.order.back"); %>
+									</button>
+								</a>
+							</li>
+						</ul>
+					</div>
+					<div class="modal-body padding-20"><%
+						if(walletTotal > 0){ %>
+							<div class="row clearfix">
+								<div class="col-sm-12">
+									<div class="form-group materialize_checkbox">
+										<div class="form-lie checkbox_wrapper">
+											<input name="wallet_amount" id="wallet_amount" class="filled-in chk-col-pink" type="hidden"/>
+											<input name="complete_payment_by_wallet" id="complete_payment_by_wallet" class="filled-in chk-col-pink" type="hidden"/>
+											<input name="is_wallet_balance" id="is_wallet_balance" class="filled-in chk-col-pink" type="checkbox" value="true"/>
+											<label for="is_wallet_balance" class="materialize-chekbox-label font-14"><%= __('admin.place_order.wallet_balance'); %>( <%= currencyFormat(walletTotal)%> )</label>
+										</div>
+									</div>
+								</div>
+							</div><%
+						} %>
+						<div class="row clearfix">
+
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="transfer_branch_id" class="control-label"><%= __('admin.orders.branch'); %> :</label>
+										<select class="form-control show-tick"  name="transfer_branch_id" id="transfer_branch_id">
+											<option value=""><%=__("admin.orders.select_branch");%></option><%
+											if(branchList && branchList.length > 0){
+												branchList.map(function(branchList,index){
+													if(String(branchList._id) != String(branch_id)){ %>
+														<option value="<%=branchList._id%>"><%=branchList.name[DEFAULT_LANGUAGE_CODE]%></option><%
+													}
+												});
+											} %>
+								        </select>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row clearfix">
+							<div class="col-sm-12">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="note" class="control-label col-555">
+											<%= __("admin.orders.note"); %>
+										</label>
+										<textarea id="note" class="form-control resize-none height-100 notSubmitOnEnter" rows="5" name="note" ></textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+						<input type="hidden" id="user_id" class="form-control" name="user_id" value="<%= (user_id) ? user_id :'';%>" />
+						<input type="hidden" id="address_id" class="form-control" name="address_id" value="<%= (address_id) ? address_id :'';%>" />
+						<input type="hidden" id="branch_id" class="form-control" name="branch_id" value="<%= (branch_id) ? branch_id :'';%>" />
+						<input type="hidden" id="restaurant_id" class="form-control" name="restaurant_id" value="<%= (restaurant_id) ? restaurant_id :'';%>" />
+						<input type="hidden" id="delivery_by" class="form-control" name="delivery_by" value="<%= (delivery_by) ? delivery_by :'';%>" />
+						<input type="hidden" id="is_scheduled" class="form-control" name="is_scheduled" value="<%= (is_scheduled) ? is_scheduled :'';%>" />
+						<input type="hidden" id="scheduled_time" class="form-control" name="scheduled_time" value="<%= (scheduled_time) ? scheduled_time :'';%>" />
+
+						<%
+						if(is_aghzeya){ %>
+							<label for=""><%= __("admin.orders.source")%> :</label>
+							<ul class="food-listing source_type"><%
+								if(sourceList.length > 0){
+
+									sourceList.map((list,index)=>{ %>
+										<li class="item-list">
+											<div class="sources">
+												<input type="radio" class="comman_unit with-gap source" name="source" id="source_<%= list.id %>" value="<%= list.id %>" <%= (index == 0) ? "checked" : "";%>>
+												<label for="source_<%= list.id %>">
+													<p>
+														<%= list[nameField] %></br>
+													</p>
+												</label>
+											</div>
+										</li><%
+									});
+								}
+								%>
+							</ul>
+
+							<ul class="food-listing parent_payment hide"><%
+								if(totalOrderAmount > 0){
+									if(Object.keys(AGHZEYA_PAYMENT_METHODS).length > 0){
+										Object.keys(AGHZEYA_PAYMENT_METHODS).map(keys=>{
+											if(keys != WALLET_PAYMENT && (isSupportSheelCard || keys != SHEEEL_CARD) && (keys != CARD_PAYMENT || (simphony && delivery_by == DELIVERY_BY_PICK_UP && keys == CARD_PAYMENT))){%>
+												<li class="item-list">
+													<div class="payment_type">
+														<input type="radio" class="comman_unit with-gap payment_method" name="payment_method" id="payment_method_<%= keys %>" value="<%= keys %>">
+														<label for="payment_method_<%= keys %>">
+															<p>
+																<%= (AGHZEYA_PAYMENT_METHODS[keys]) ? AGHZEYA_PAYMENT_METHODS[keys].split("-")[1] : "";%></br>
+															</p>
+														</label>
+													</div>
+												</li><%
+											}
+										});
+									}
+								}else{  %>
+									<li class="item-list">
+										<div class="payment_type">
+											<input type="radio" class="comman_unit with-gap payment_method" name="payment_method" id="payment_method_0" value="<%= CASH_PAYMENT%>">
+											<label for="payment_method_0">
+												<p>
+													<%= (AGHZEYA_PAYMENT_METHODS[CASH_PAYMENT]) ? AGHZEYA_PAYMENT_METHODS[CASH_PAYMENT].split("-")[1] : "";%></br>
+												</p>
+											</label>
+										</div>
+									</li><%
+								}%>
+							</ul>
+							<span id="payment_method_error" class="error"></span>
+							<!-- Talabat methods -->
+							<ul class="food-listing talabat_methods hide"><%
+								if(totalOrderAmount > 0){
+									if(sourcePaymentMethods.length > 0){
+										sourcePaymentMethods.map(method=>{
+											if(method.id != 5){
+										%>
+											<li class="item-list">
+												<div class="payment_type">
+													<input type="radio" class="comman_unit with-gap source_payment" name="source_payment" id="source_payment_<%= method.id %>" value="<%= method.id+","+method[nameField] %>">
+													<label for="source_payment_<%= method.id %>">
+														<p>
+															<%= method[nameField]%></br>
+														</p>
+													</label>
+												</div>
+											</li><%}
+										});
+									}
+								}else{  %>
+									<li class="item-list">
+										<div class="payment_type">
+											<input type="radio" class="comman_unit with-gap source_payment" name="source_payment" id="source_payment_0" value="<%= CASH_PAYMENT%>">
+											<label for="source_payment_0">
+												<p>
+													<%= PAYMENT_METHODS[CASH_PAYMENT]%></br>
+												</p>
+											</label>
+										</div>
+									</li><%
+								}%>
+							</ul>
+							<span id="source_payment_error" class="error"></span>
+							<ul class="food-listing sheel_card_wrapper hide">
+								<li class="item-list form-group">
+									<div class="form-line">
+										<label for="sheel_card">
+											<%= __("admin.orders.sheeel_card_number")%><span class="required"> *</span>
+										</label>
+										<input type="text" class="comman_unit form-control sheel_card" name="sheel_card" id="sheel_card"/>
+									</div>
+								</li>
+							</ul>
+						<%
+						} else { %>
+							<!-- payment methods -->
+							<ul class="food-listing parent_payment"><%
+								if(totalOrderAmount > 0){
+									if(result.length > 0){
+										result.map((list,keys)=>{
+											if(list.slug != WALLET_PAYMENT){%>
+												<li class="item-list">
+													<div class="payment_type">
+														<input type="radio" class="comman_unit with-gap payment_method" name="payment_method" id="payment_method_<%= keys %>" value="<%= list.slug %>">
+														<label for="payment_method_<%= keys %>">
+															<p>
+																<%= list.title[DEFAULT_LANGUAGE_CODE]%></br>
+															</p>
+														</label>
+													</div>
+												</li><%
+											}
+										});
+									}else{  %>
+										<li class="item-list">
+											<div class="payment_type">
+												<input type="radio" class="comman_unit with-gap payment_method" name="payment_method" id="payment_method_0" value="<%= CASH_PAYMENT%>">
+												<label for="payment_method_0">
+													<p>
+														<%= PAYMENT_METHODS[CASH_PAYMENT]%></br>
+													</p>
+												</label>
+											</div>
+										</li><%
+									}
+								}else{  %>
+									<li class="item-list">
+										<div class="payment_type">
+											<input type="radio" class="comman_unit with-gap payment_method" name="payment_method" id="payment_method_0" value="<%= CASH_PAYMENT%>">
+											<label for="payment_method_0">
+												<p>
+													<%= PAYMENT_METHODS[CASH_PAYMENT]%></br>
+												</p>
+											</label>
+										</div>
+									</li><%
+								}%>
+							</ul>
+							<span id="payment_method_error" class="error"></span>
+						<%
+						}%>
+						<div class="row clearfix reference_number hide">
+							<div class="col-sm-6">
+								<div class="form-group">
+									<div class="form-line">
+										<label for="note" class="control-label col-555">
+											<%= __("admin.orders.reference_number"); %><span class="required"> *</span>
+										</label>
+										<input type="text" class="form-control" name="reference_number" id="reference_number" value="">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="payment_detail">
+							<table>
+								<tr>
+									<td><h5><%= __('admin.order.sub_total'); %>:</h5></td>
+									<td class="text-right"><h5><strong><%= currencyFormat(itemSubTotal) %></strong></h5></td>
+								</tr><%
+								if(delivery_by && delivery_by == DELIVERY_BY_CRAVEZ){ %>
+									<tr>
+										<td><h5><%= __('admin.order.delivery_fees'); %>:</h5></td>
+										<td class="text-right"><h5><strong><%= currencyFormat(deliveryFees) %></strong></h5></td>
+									</tr><%
+								} %>
+								<tr>
+									<td><h5><%= __('admin.order.discount'); %>:</h5></td>
+									<td class="text-right"><h5><strong><%= currencyFormat(discount) %></strong></h5></td>
+								</tr> <%
+								if(outstandingOrderAmount >0){ %>
+									<tr>
+										<td><h5><%- __('admin.user_management.order_outstanding')+":<br/>"+outstandingOrderLink; %></h5></td>
+										<td class="text-right"><h5><strong><%= currencyFormat(outstandingOrderAmount) %></strong></h5></td>
+
+									</tr> <%
+								} %>
+								<tr>
+									<td><h5><%= __('admin.order.total'); %>:</h5></td>
+									<td class="text-right"><h5><strong><%= currencyFormat(totalOrderAmount) %></strong></h5></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+					<div class="modal-footer modal-footer-seperator">
+						<button type="button" id="address-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+							<%= __("admin.user_management.place_order"); %>
+						</button>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function(){
+		var sourceId = $("input[name='source']:checked").attr("id");
+		if(sourceId) sourceChange(sourceId);
+	});
+
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('place-order',function(status,response){
+			if(status){
+				localStorage.clear();
+				$('#form_modal').modal('hide');
+				window.location.href = '<%= WEBSITE_ADMIN_URL+"orders/view/" %>'+response.order_id+'<%= "/order_details"%>';
+			}else{
+				notice('error',response.message);
+				stopTextLoading(btnId);
+			}
+		});
+	});
+
+	/**
+	 * To go back on menu list
+	 */
+	$('.open-categories').click(function(){
+		startTextLoading('back_button');
+		var url	=	$(this).attr('data-action');
+		var userId          =   $('#user_id').val();
+		var branchId        =   $('#branch_id').val();
+		var restaurantId    =   $('#restaurant_id').val();
+		var addressId    	=   $('#address_id').val();
+		var isScheduled    =   '<%= is_scheduled%>';
+		var scheduledTime  =   '<%= scheduled_time%>';
+		$.ajax({
+			url       : url,
+			type      : "POST",
+			data	  : {branch_id : branchId,restaurant_id:restaurantId,user_id:userId,delivery_by:'<%= delivery_by%>',area_id : '<%= area_id%>',address_id : addressId,is_scheduled:isScheduled,scheduled_time:scheduledTime},
+			success: function(response){
+				$('#form_modal').html(response);
+			},
+		});
+	});
+
+
+	$('input[name=payment_method]').change(function() {
+		var value	=	$(this).val();
+		$('.sheel_card_wrapper').addClass('hide');
+		if(value == '<%= CASH_PAYMENT%>'){
+			$('.sub_payments').removeClass('hide');
+		} else if(value == '<%= SHEEEL_CARD%>'){
+			$('.sheel_card_wrapper').removeClass('hide');
+		} else{
+			$('.sub_payments').addClass('hide');
+		}
+	});
+
+	$('input[name=source_payment]').change(function() {
+		var methodId	=	$(this).attr("id");
+		$('.sheel_card_wrapper').addClass('hide');
+		$('.sheel_card').val("");
+		if(methodId == "source_payment_5"){
+			$('.sheel_card_wrapper').removeClass('hide');
+			$('.sheel_card').val("");
+		}
+	});
+	var walletAmount	=	<%= walletTotal%>;
+	var grandAmount		=	<%= grandTotal%>;
+	$('input[type="checkbox"]').change(function() {
+		$("#wallet_amount").attr('value',"");
+		$("#complete_payment_by_wallet").attr('value',"");
+
+		if($("#is_wallet_balance").prop('checked') == true){
+			if(walletAmount > grandAmount){
+				$("#complete_payment_by_wallet").attr('value',"<%=ACTIVE%>");
+				$('.parent_payment').addClass('hide');
+				$("#wallet_amount").attr('value',grandAmount);
+			}else{
+				$("#wallet_amount").attr('value',walletAmount);
+			}
+		}else{
+			$('.parent_payment').removeClass('hide');
+			if(walletAmount > grandAmount){
+				$('input[name="payment_method"]').attr('checked',false);
+			}
+		}
+	});
+
+	$("input[name=source]").change(function() {
+		var radioId = $(this).attr("id");
+		sourceChange(radioId);
+	});
+
+	function sourceChange(radioId){
+		$('.sheel_card_wrapper').addClass('hide');
+		$('.reference_number').addClass('hide');
+		$('.sheel_card').val("");
+		$('input[name="payment_method"]').attr('checked',false);
+		$('input[name="source_payment"]').attr('checked',false);
+		if($("input[id="+radioId+"]").val() == '<%=SOURCE_CALL_CENTER%>'){
+			$('.parent_payment').removeClass('hide');
+			$('.talabat_methods').addClass('hide');
+			$('.reference_number').addClass('hide');
+		}else{
+			$('.parent_payment').addClass('hide');
+			$('.talabat_methods').removeClass('hide');
+			$('.reference_number').removeClass('hide');
+		}
+	}
+</script>

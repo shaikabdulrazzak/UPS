@@ -1,0 +1,207 @@
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="body">
+                <form id="parameters-edit" class="on_click_submit" action="<%= admin_list_url+'/parameters/'+result._id %>" data-submit-btn-id="parameters-edit-btn-id" method="post" role="form">
+                    <div class="row clearfix">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="max_number_order" class="control-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <%Object.keys(HUB_PARAMETER_DROPDOWN).map(parameterStatus=>{
+                                        var selected = (parameterStatus == OFF) ? "checked" : "";
+                                        if(result.parameter_status == ON){
+                                            selected =  "checked" ;
+                                        }
+                                     %>
+                                        <input id="<%=parameterStatus%>" name="parameters_status"  class="with-gap" type="radio" value="<%=parameterStatus%>" <%=selected%>>
+                                        <label for="<%=parameterStatus%>"><%= HUB_PARAMETER_DROPDOWN[parameterStatus] %></label>
+                                    <% });%>
+                                </div>
+                                <span id="parameters_status_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="max_order" class="control-label">
+                                        <%= __("admin.hubs.max_no_of_order_assigned_to_captain"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="max_order" class="form-control" name="max_order" value="<%= result.max_no_of_order_assigned ? result.max_no_of_order_assigned : '' %>" />
+                                </div>
+                                <span id="max_order_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="unassigned_order" class="control-label">
+                                        <%= __("admin.hubs.no_of_order_unassigned"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="unassigned_order" class="form-control" name="unassigned_order" value="<%= result.no_of_unassigned_order ? result.no_of_unassigned_order : '' %>" />
+                                </div>
+                                <span id="unassigned_order_error" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <input class="with-gap"  type="radio" name="no_of_unassigned_status" id="unassigned_on" value="<%=ON%>" <%=(result.no_of_unassigned_status== ON) ? 'checked' :''%> />
+                                    <label for="unassigned_on"><%= HUB_PARAMETER_DROPDOWN[ON] %></label>
+                                    <input class="with-gap"  type="radio" name="no_of_unassigned_status" id="unassigned_off" value="<%=OFF%>" <%=(result.no_of_unassigned_status != ON) ? 'checked' :''%> />
+                                    <label for="unassigned_off"><%= HUB_PARAMETER_DROPDOWN[OFF] %></label>
+                                </div>
+                                <span id="no_of_unassigned_status_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="max_unassigned_order" class="control-label">
+                                        <%= __("admin.hubs.max_no_of_order_unassigned"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="max_unassigned_order" class="form-control" name="max_unassigned_order" value="<%= result.max_no_of_unassigned_order ? result.max_no_of_unassigned_order : '' %>" />
+                                </div>
+                                <span id="max_unassigned_order_error" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <% var selected = 'checked'; %>
+                                    <input class="with-gap"  type="radio" name="max_no_of_unassigned_status" id="max_unassigned_on" value="<%=ON%>" <%=(result.max_no_of_unassigned_status == ON) ? 'checked' :''%> />
+                                    <label for="max_unassigned_on"><%= HUB_PARAMETER_DROPDOWN[ON] %></label>
+                                    <input class="with-gap"  type="radio" name="max_no_of_unassigned_status" id="max_unassigned_off" value="<%=OFF%>" <%=(result.max_no_of_unassigned_status != ON) ? 'checked' :''%> />
+                                    <label for="max_unassigned_off"><%= HUB_PARAMETER_DROPDOWN[OFF] %></label>
+                                </div>
+                                <span id="max_no_of_unassigned_status_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="urgent_max_unassigned_order" class="control-label">
+                                        <%= __("admin.hubs.urgent_max_no_of_unassigned_order"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="urgent_max_unassigned_order" class="form-control" name="urgent_max_unassigned_order" value="<%= result.urgent_max_no_of_unassigned_order ? result.urgent_max_no_of_unassigned_order : '' %>" />
+                                </div>
+                                <span id="urgent_max_unassigned_order_error" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="text-center">
+                                    <% var selected = 'checked'; %>
+                                    <input class="with-gap"  type="radio" name="urgent_max_no_of_unassigned_status" id="urgent_max_unassigned_on" value="<%=ON%>" <%=(result.urgent_max_no_of_unassigned_status == ON) ? 'checked' :''%> />
+                                    <label for="urgent_max_unassigned_on"><%= HUB_PARAMETER_DROPDOWN[ON] %></label>
+                                    <input class="with-gap"  type="radio" name="urgent_max_no_of_unassigned_status" id="urgent_max_unassigned_off" value="<%=OFF%>" <%=(result.urgent_max_no_of_unassigned_status != ON) ? 'checked' :''%> />
+                                    <label for="urgent_max_unassigned_off"><%= HUB_PARAMETER_DROPDOWN[OFF] %></label>
+                                </div>
+                                <span id="urgent_max_no_of_unassigned_status_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="assigned_buffer_time" class="control-label">
+                                        <%= __("admin.hubs.assigned_buffer_time"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="assigned_buffer_time" class="form-control" name="assigned_buffer_time" value="<%= result.assigned_buffer_time ? result.assigned_buffer_time : '' %>" />
+                                </div>
+                                <span id="assigned_buffer_time_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row clearfix">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <label for="assigned_max_buffer_time" class="control-label">
+                                        <%= __("admin.hubs.assigned_max_buffer_time"); %>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <div class="form-line">
+                                    <input type="text" id="assigned_max_buffer_time" class="form-control" name="assigned_max_buffer_time" value="<%= result.assigned_max_buffer_time ? result.assigned_max_buffer_time : '' %>" />
+                                </div>
+                                <span id="assigned_max_buffer_time_error" class="error"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!--  submit btn html -->
+                    <button type="button" id="parameters-edit-btn-id" class="btn bg-brown btn-sm waves-effect parameters-btn-submit" <%- ADMIN_LOADING_TEXT %> >
+						<%= __("admin.system.submit"); %>
+					</button>
+                    <a href="javascript:location.reload(true);" class="text-decoration-none"><button type="button" class="btn bg-blue-grey btn-sm waves-effect"> <%= __("admin.system.reset"); %></button></a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+	$('.parameters-btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('parameters-edit',function(status,response){
+			if(status){
+                $("#parameters-edit span.error").html("");
+				notice("success",response.message);
+                stopTextLoading(btnId);
+			}else{
+				stopTextLoading(btnId);
+			}
+		});
+	});
+</script>

@@ -1,0 +1,197 @@
+<%
+	let languageCode=	(item_display_lng_code) ? item_display_lng_code :DEFAULT_LANGUAGE_CODE;
+	let itemList	=	(typeof data != typeof undefined && data.result) ? data.result :	[];
+	let totalItem	=	(typeof data != typeof undefined) ? data.total_item :	0;
+	let imageUrl	=	(typeof data != typeof undefined) ? data.item_image_url :	'';
+	let areaList	=	(typeof area_list != typeof undefined) ? area_list : [];
+if(!load_more){%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="modal-dialog modal-lg"  role="document">
+			<div class="modal-content itemsearchlist">
+				<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+					<h2 class="modal-title">
+						<%= __("admin.order_food.items"); %>
+					</h2>
+					<ul class="header-dropdown m-r--5 order_back_button">
+						<li>
+							<a href="<%=WEBSITE_ADMIN_URL+'place_order/'+user_id%>" data-open-modal="true" class="action-btn" >
+								<button type="button" class="btn bg-indigo btn-sm waves-effect noHover"><%= __("admin.order.back"); %></button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="modal-body padding-20">
+					<div class="row clearfix">
+						<div class="col-sm-12">
+							<form id="place-order" data-submit-btn-id="place-order-btn-id" action="<%=WEBSITE_ADMIN_URL+"place_order/"+user_id%>" method="post" class="on_click_submit" role="form">
+								<div class="row clearfix">
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="form-line">
+												<label for="area_id" class="control-label col-555">
+													<%= __("admin.orders.area_id"); %><span class="required"> *</span>
+												</label>
+												<input id="type" name="type" type="hidden" value="<%=ORDER_BY_ITEM%>">
+												<select class="form-control show-tick area_name" id="area_id"   name="area_id" title='<%=__("admin.order_food.enter_your_delivery_location");%>' data-live-search="true"><%
+													if(areaList.length > 0){
+														areaList.map(list=>{ %>
+															<optgroup label="<%= list.city_name[languageCode]; %>">
+															<% if(list.area_list.length > 0){
+																list.area_list.map(area=>{
+																	var checked	=	(String(area._id) == String(area_id)) ? 'selected' : ''; %>
+																	<option value="<%= area._id%>" <%= checked%>><%= area.name[languageCode]%></option><%
+																});
+															} %>
+															</optgroup><%
+														});
+													} %>
+												</select>
+											</div>
+											<span id="area_id_error" class="error"></span>
+										</div>
+									</div>
+									<div class="col-sm-6">
+										<div class="form-group">
+											<div class="form-line">
+												<label for="item_name" class="control-label col-555">
+													<%= __("admin.orders.item_name"); %>
+												</label>
+												<input type="text" id="item_name" class="form-control" name="item_name" value="<%= selected_data%>"/>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="modal-footer modal-footer-seperator">
+									<button type="button" id="place-order-add-btn-id" class="btn bg-brown btn-sm waves-effect col-white btn-submit" <%- ADMIN_LOADING_TEXT %> >
+										<%= __("admin.system.search"); %>
+									</button>
+								</div>
+							</form>
+						</div>
+						</div>
+
+						<ul class="food-listing"><% }
+							if(itemList.length > 0){
+								itemList.map(list=>{ %>
+									<li class="item-list">
+										<div class="item_image">
+											<a href="javascript:void(0);" class="make_order" data-action="<%= WEBSITE_ADMIN_URL+'place_order/make_order'%>" data-item-id="<%= list._id%>" data-restaurant-id="<%= list.restaurant_id%>" data-branch-id="<%= list.branch_id%>" data-user-id="<%= user_id%>" data-area-id="<%= area_id%>">
+												<figure>
+													<img src="<%= imageUrl+list.image%>" alt="<%= list.name[languageCode]%>" onerror="this.src='<%= NO_IMAGE_AVAILABLE%>'" class="set_image_dim-250-220">
+												</figure>
+											</a>
+										</div>
+										<div class="item_content">
+											<h4><%= list.name[languageCode]%></h4>
+											<h6>Restaurant Name : <%= list.restaurant_name[languageCode]%></h6>
+											<div class="addon"><strong><%= currencyFormat(list.item_price)%></strong></div>
+										</div>
+									</li><%
+									skip++;
+								});
+							}else{ %>
+								<li class="no-record-found text-center"><%= __('admin.system.no_record_found');%></li><%
+							}
+							if(!load_more){ %>
+						</ul>
+						 <div class="text-center loadmore <%= (totalItem > skip) ? '' : 'hide';%>">
+							<a href="javascript:void(0)" data-skip="<%=skip%>" id="view_more" class="btn getbtn btn-primary btn-rounded"><%= __("admin.order_food.show_more")%> </a>
+						</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	/**
+	* Get more content by ajax
+	*/
+	$("#view_more").click(function(e){
+	  startTextLoading('view_more');
+	  var skip = $(this).attr("data-skip");
+	  getData(skip);
+	});
+
+	/**
+    * Get more content by ajax
+    */
+    function getData(skip){
+		$.ajax({
+			url       : '<%= WEBSITE_ADMIN_URL+"place_order/"+user_id%>/'+skip,
+			type      : "POST",
+			data      : {
+				user_id	: '<%= user_id%>',
+				area_id	: '<%= area_id%>',
+				type 	: '<%= ORDER_BY_ITEM%>',
+				load_more : true,
+				skip	: '<%= skip%>',
+			},
+			success: function(response){
+				$('.food-listing').append(response);
+				var totalRest	=	'<%= totalItem%>';
+				var limit		=	'<%= (settings['Site.front_record_limit']) ? parseInt(settings['Site.front_record_limit']) :FRONT_LISTING_LIMIT %>';
+				var skip		=	parseInt($('#view_more').attr('data-skip')) + parseInt(limit);
+				if(totalRest > skip){
+					$('.loadmore').removeClass('hide');
+				}else{
+					$('.loadmore').addClass('hide');
+				}
+				$('#view_more').attr('data-skip',skip);
+				stopTextLoading('view_more');
+			},
+		});
+    }
+
+	/**
+    * for filter by item name
+    */
+	$('.search_text').keyup('click', function(e){
+		search_value = $('.search_text').val(), count = 0;
+		var rg = new RegExp(search_value, 'i');
+		$(".food-listing li").each(function() {
+			if ($(".item_content h4", this).text().match(rg)){
+				$(this).show();
+			} else {
+				$(this).hide();
+			}
+		});
+	});
+
+	/**
+	 * Function to submit form
+	 */
+	$('.btn-submit').click(function(){
+		var btnId = $(this).attr('id');
+		startTextLoading(btnId);
+		ajax_submit('place-order',function(status,response){
+			if(typeof response !== 'object'){
+				$('#form_modal').html(response);
+			}
+			stopTextLoading(btnId);
+		});
+	});
+</script><%
+} %>
+<script type="text/javascript">
+	/**
+    * To get item detail page
+    */
+	$('.make_order').click(function(){
+    	var url			=	$(this).attr('data-action');
+		var itemId		=	$(this).attr('data-item-id');
+		var restaurantId=	$(this).attr('data-restaurant-id');
+		var branchId	=	$(this).attr('data-branch-id');
+		var areaId		=	$(this).attr('data-area-id');
+		var userId		=	$(this).attr('data-user-id');
+		$.ajax({
+			url       : url,
+			type      : "POST",
+			data	  : {branch_id : branchId,restaurant_id:restaurantId,area_id:areaId,user_id:userId,item_id:itemId},
+			success: function(response){
+				$('#form_modal').html(response);
+			},
+		});
+	});
+</script>

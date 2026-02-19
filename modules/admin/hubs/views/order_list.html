@@ -1,0 +1,50 @@
+<%
+ var hubId		=	(hub_id)	?	hub_id	    :hub_id;
+ var branchList  = 	(typeof branch_list !== typeof undefined && branch_list) 	? 	branch_list 	:"";
+ var originalUrl     =  admin_list_url+'/order_slabs/'+hubId
+%>
+<div class="row clearfix" >
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="body">
+                <div class="row clearfix">
+                    <div class="col-sm-9"></div>
+                        <!-- Search by branch name -->
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <div class="form-line">
+                                <select class="form-control show-tick"  name="branch_id" id="branch_id" data-live-search="true">
+                                    <%-branchList%>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-container">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+	/**
+	 * Function to submit form
+	 */
+    /* Event triggered when click on tab btn */
+    $(document).on('change','#branch_id',function(e){
+        var branch_id = $(this).val();
+        var options = {
+            url 	: 	"<%=originalUrl%>/"+branch_id,
+            method	:	"get"
+        };
+        ajaxRequest(options,function(response){
+            $('.main-container').html(response);
+        });
+    });
+
+    $('#branch_id').trigger("change");
+    /** Refresh bootstrap select box  **/
+	$(".show-tick").selectpicker('refresh');
+</script>

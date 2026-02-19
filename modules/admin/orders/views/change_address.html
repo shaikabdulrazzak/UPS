@@ -1,0 +1,100 @@
+<div class="modal-dialog"  role="document">
+	<div class="modal-content">
+		<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+			<h2 class="modal-title"><%=__("admin.orders.change_address") %><span class="cursor-pointer modal-close pull-right" data-dismiss="modal"><i class="material-icons">close</i></span></h2>
+
+			<ul class="header-dropdown m-r--5 order_back_button">
+				<li>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/add_address/<%= order_id%>" data-open-modal="true" class="action-btn">
+						<button type="button" class="btn btn-sm bg-indigo waves-effect noHover">
+							<%= __("admin.orders.add_address"); %>
+						</button>
+					</a>
+				</li>
+			</ul>
+		</div>
+		<form id="address-form" data-submit-btn-id="address_btn" method="post" class="on_click_submit" role="form" action='<%= WEBSITE_ADMIN_URL+'orders/change_address/'+order_id%>'>
+			<div class="modal-body" id="receipt-content">
+				<div class="row">
+					<%
+						if(result.length > 0){ %>
+							<div class="form-group">
+								<input type="hidden"  name="previous_address_id" id="previous_address_id" value="<%=address_id%>">
+								<div class="form-line radio-div"><%
+									result.map((records,keys)=>{
+										var checked	=	(String(records._id) == String(address_id)) ? 'checked' : '';
+										%>
+										<div class="col-sm-12 address-box <%= (keys > 0) ? "m-t-5" : ''; %> <%= (checked) ? 'address-active' : '';%>">
+											<div class="col-sm-11">
+												<input type="radio" class="comman_unit with-gap address_id" name="address_id" id="address_<%= keys %>" value="<%= records._id %>" <%= checked %>>
+												<label for="address_<%= keys %>">
+													<p>
+														<%= (records.first_name) ? records.first_name : '';%> <%= (records.last_name) ? records.last_name : '';%></br>
+														<%= (records.mobile_number) ? records.mobile_number : '';%></br>
+														<%= (records.city_name) ? records.city_name[DEFAULT_LANGUAGE_CODE] : '';%>,
+														<%= (records.area_name) ? records.area_name[DEFAULT_LANGUAGE_CODE] : '';%>,
+														<%= (records.block_name) ? records.block_name[DEFAULT_LANGUAGE_CODE] : '';%>,
+														<%= (records.street) ? records.street : '';%><br>
+														<%= (records.address_type) ? records.address_type : '';%></br>
+														<%= __("admin.orders.latitude"); %>: <%= (records.latitude) ? records.latitude : '';%><br/>
+														<%= __("admin.orders.longitude"); %>: <%= (records.longitude) ? records.longitude : '';%>
+													</p>
+												</label>
+											</div>
+											<div class="col-sm-1">
+												<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/edit_address/<%= order_id%>/<%= records._id%>" data-open-modal="true" class="action-btn">
+													<button type="button" class="btn btn-xs bg-indigo waves-effect noHover">
+														<i class="material-icons">mode_edit</i>
+													</button>
+												</a>
+											</div>
+										</div><%
+									}); %>
+								</div>
+								<span id="address_error" class="error"></span>
+							</div><%
+						}else{ %>
+							<div class="col-sm-12 text-center"><%= __('admin.system.no_record_found')%></div><%
+						}
+					%>
+				</div>
+			</div><%
+			if(result.length > 0){ %>
+				<div class="modal-footer border-top">
+					<button type="button"  id="address_btn" <%- ADMIN_LOADING_TEXT %> class="btn bg-brown btn-sm waves-effect btn-submit noHover margin-0"><%= __("admin.system.submit"); %>
+							</button>
+					<button type="button" class="btn bg-pink btn-sm waves-effect close_modal noHover" data-dismiss="modal"><%= __("admin.system.cancel"); %></button>
+				</div><%
+			} %>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+	adjustPermissionsClass();
+	/**
+	* Function to submit  modal form
+	*/
+	$(".btn-submit").click(function(){
+		var btnId = $(this).attr("id");
+		startTextLoading(btnId);
+
+		ajax_submit("address-form",function(status,response){
+			stopTextLoading(btnId);
+			if(status){
+				window.location.reload();
+			}
+		});
+	});
+
+	/** to highlight the address */
+	$('.address_id').click(function(e){
+		$('.radio-div').children().removeClass('address-active');
+		$(this).parent().addClass('address-active');
+	});
+
+	$(document).on('click','.close_address',function(e){
+		$('#change_address').css('overflow-y','auto');
+		getAdress('<%= order_id%>');
+		$(".pac-container").remove();
+	});
+</script>

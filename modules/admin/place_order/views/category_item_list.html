@@ -1,0 +1,209 @@
+<%
+	let languageCode		=	(item_display_lng_code) ? item_display_lng_code : DEFAULT_LANGUAGE_CODE;
+	let categoryList		=	(typeof item_list != typeof undefined) ? item_list.result :	[];
+	let imageUrl			=	(typeof item_list != typeof undefined) ? item_list.item_image_url :	'';
+	let restImageUrl		=	(typeof item_list != typeof undefined) ? item_list.restaurant_image_url :	'';
+	let branchDetails		=	(branch_details) ? branch_details :	{};
+	let restaurantName		=	(branchDetails.restaurant_name) 	?	branchDetails.restaurant_name[languageCode] :'';
+	let deliveryTime		=	(branchDetails.delivery_time) 		?	branchDetails.delivery_time 				:'';
+	let preparationTime		=	(branchDetails.preparation_time) 	? 	branchDetails.preparation_time 				:'';
+	let minOrderLimit		=	(branchDetails.minimum_order_limit) ? 	branchDetails.minimum_order_limit 			:'0';
+	let paymentMethods		=	(branchDetails.payment_methods) 	?	branchDetails.payment_methods 				:'';
+	let hotLineNumber		=	(branchDetails.phones) 	?	branchDetails.phones[BRANCH_HOT_LINE_NUMBER_ATTRIBUTE_ID] 	:'N/A';
+	let managerNumber		=	(branchDetails.phones)	?	branchDetails.phones[BRANCH_MANAGER_ATTRIBUTE_ID] 			:'N/A';
+	let paymentsDetail		=	[];
+
+	let branchName			=	(branchDetails.name) ? branchDetails.name[languageCode] : '';
+	let branchAddress			=	(branchDetails.address) ? branchDetails.address : '';
+	if(paymentMethods.length > 0){
+		paymentMethods.map(item=> {
+			if(item.slug != WALLET_PAYMENT){
+				if(item.title && item.title[[languageCode]]) paymentsDetail.push(item.title[languageCode]);
+			}
+		});
+	}
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 cart_modal_popup">
+		<div class="modal-dialog modal-lg"  role="document">
+			<div class="modal-content itemlist-popup">
+				<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+					<h2 class="modal-title">
+						<%= __("admin.order_food.menu_list"); %><span class="cursor-pointer modal-close pull-right" data-dismiss="modal"><i class="material-icons">close</i></span>
+					</h2>
+					<ul class="header-dropdown m-r--5 order_back_button">
+						<li>
+							<a href="javascript:void(0);" class="checkout" data-action="<%= WEBSITE_ADMIN_URL+'place_order/'+user_id%>" data-restaurant-id="<%= restaurant_id%>" data-branch-id="<%= branch_id%>" data-user-id="<%= user_id%>" data-area-id="<%= area_id%>">
+								<button type="button" class="btn bg-indigo btn-sm waves-effect noHover" id="back_button">
+									<%= __("admin.order.back"); %>
+								</button>
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+					<div class="modal_body_row">
+						<div class="left_cart">
+							<div class="restaurantlist-timing">
+								<div class="row clearfix">
+									<div class="col-sm-4">
+										<figure>
+											<img class="img-fluid set_image_dim-300-265" src="<%= restImageUrl+branchDetails.image %>" onerror="this.src='<%= NO_IMAGE_AVAILABLE%>'">
+										</figure>
+									</div>
+									<div class="col-sm-4">
+										<div class="restauranttiming inline-data">
+											<strong class="restaurant-name"><%= restaurantName%></strong>
+											<ul>
+												<li><span><strong><%= __('admin.place_order.branch_name')%> : </strong><%= branchName%></span></li>
+												<li><span><strong><%= __('admin.place_order.branch_address')%> : </strong><%= branchAddress%></span></li>
+											</ul>
+										</div>
+									</div>
+									<div class="col-sm-4">
+										<div class="restauranttiming inline-data">
+											<ul>
+												<li><span class="restaurant-payment"><strong>Payment Detail : </strong> <%= (paymentsDetail.length > 0) ? paymentsDetail.join(', ') : PAYMENT_METHODS[CASH_PAYMENT]%></span></li>
+												<li>
+													<span><strong><%= __('admin.order_food.hot_line');%>: </strong><%= hotLineNumber %></span>
+													<span><strong><%= __('admin.order_food.manager');%>: </strong><%= managerNumber %></span>
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+								<div class="row clearfix">
+									<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 m-t-20">
+										<div class="col-sm-4">
+											<strong><%= __('admin.place_order.minimum_order')%> :</strong> <%= currencyFormat(minOrderLimit)%></span>
+										</div>
+										<div class="col-sm-4">
+											<strong><%= __('admin.order_food.preparation_time');%>: </strong><%= preparationTime %> <%= (preparationTime) ? __('admin.order_food.min') : "N/A";%>
+										</div>
+										<div class="col-sm-4">
+											<strong><%= __('admin.order_food.delivery_time');%>: </strong><%= deliveryTime %> <%= (deliveryTime) ? __('admin.order_food.min') :"N/A";%>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row clearfix">
+								<div class="panel-group add_choice_data padding-20" id="accordion" role="tablist" aria-multiselectable="true"><%
+								if(categoryList.length > 0){
+									categoryList.map((data,key)=>{ %>
+										<div class="panel panel-default">
+											<div class="panel-heading">
+												<h4 class="panel-title">
+													<a role="button" data-toggle="collapse" href="#collapse_<%= key%>" aria-expanded="true" aria-controls="collapse_<%= key%>" class="collapsed">
+													<%= (data.name[languageCode]) ? data.name[languageCode] : ''%>
+														<span class="pull-right collapse-toggle-icon"></span>
+													</a>
+												</h4>
+											</div>
+											<div id="collapse_<%= key%>" class="panel-collapse collapse" role="tabpanel" aria-labelledby="heading_<%= key%>" aria-expanded="true" data-parent="#accordion" style="">
+												<ul class="food-listing"><%
+													if(data.item_list.length > 0){
+														data.item_list.map(list=>{
+															let description	=	(list.description && list.description[languageCode]) ? list.description[languageCode] : '';
+															description	=	(description && description.length > 130) ? description.substr(0, 130-1) + '.....' : description;%>
+															<li class="item-list">
+																<a href="javascript:void(0);" class="make_order" data-action="<%= WEBSITE_ADMIN_URL+'place_order/make_order'%>" data-item-id="<%= list._id%>" data-restaurant-id="<%= restaurant_id%>" data-branch-id="<%= branch_id%>" data-user-id="<%= user_id%>" data-area-id="<%= area_id%>">
+																	<div class="item_image">
+																		<figure>
+																			<img src="<%= imageUrl+list.image%>" alt="" onerror="this.src='<%= NO_IMAGE_AVAILABLE%>'" class="set_image_dim-130-75">
+																		</figure>
+																		<div class="item_description">
+																			<h4><%= (list.name && list.name[languageCode]) ? list.name[languageCode] : ''%></h4>
+																			<p><%= description%></p>
+																		</div>
+																	</div>
+																	<div class="item_content">
+																		<div class="addon"><strong><%= currencyFormat(list.item_price)%></strong></div>
+																	</div>
+																</a>
+															</li><%
+														});
+													}
+													%>
+												</ul>
+											</div>
+										</div><%
+									});
+								} %>
+							</div>
+						</div>
+					</div>
+				<div class="right_cart"><div class="modal-body padding-20 append_cart"></div></div>
+				</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$('.make_order').click(function(){
+		var url			=	$(this).attr('data-action');
+		var itemId		=	$(this).attr('data-item-id');
+		$.ajax({
+			url       : url,
+			type      : "POST",
+			data	  : {branch_id : '<%= branch_id%>',restaurant_id:'<%= restaurant_id%>',user_id:'<%= user_id%>', area_id: '<%= area_id%>',item_id:itemId,scheduled_time:'<%= scheduled_time %>',is_scheduled:'<%= is_scheduled %>',address_id:'<%= address_id %>',delivery_by:'<%= delivery_by %>'},
+			success: function(response){
+				$('#form_modal').html(response);
+			},
+		});
+	});
+
+	/**
+	* Function to add cart detail
+	*/
+	function myCart(){
+		$.ajax({
+			url 	:	"<%=list_url%>/my_cart",
+			type	: 	"POST",
+			data	:	{user_id : '<%= user_id%>',branch_id : '<%= branch_id%>',area_id : '<%= area_id%>',restaurant_id:'<%= restaurant_id%>',scheduled_time:'<%= scheduled_time %>',is_scheduled:'<%= is_scheduled %>',address_id:'<%= address_id %>',delivery_by:'<%= delivery_by %>'},
+			success	: 	function(res){
+				$('.append_cart').html(res);
+				$('#form_modal').scrollTop(0);
+			}
+		});
+	}
+
+	/**
+	 * Function to push item into cart
+	 */
+	$('.checkout').click(function(){
+		var url	=	$(this).attr('data-action');
+		var restaurantId=	$(this).attr('data-restaurant-id');
+		var branchId	=	$(this).attr('data-branch-id');
+		var areaId	=	$(this).attr('data-area-id');
+		var userId		=	$(this).attr('data-user-id');
+		swal({
+			title: '<%= __("admin.system.are_you_sure")%>',
+			text: '<%- __("admin.order.previous_selection_will_reset")%>',
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: '<%= __("Yes")%>',
+			closeOnConfirm: true,
+			showLoaderOnConfirm: false,
+		}, function (isConfirm) {
+			 if (isConfirm) {
+				startTextLoading('back_button');
+				$.ajax({
+					url 	:	url,
+					type	: 	"POST",
+					data	:	{'branch_id':branchId,'restaurant_id':restaurantId,'user_id':userId, 'area_id': areaId},
+					success	: 	function(res){
+						$('#form_modal').html(res);
+						$('.open-categories[data-restaurant-id='+restaurantId+']').trigger('click');
+					}
+				});
+			}else {
+				stopTextLoading('back_button');
+			}
+		});
+
+	});
+	myCart();
+
+</script>

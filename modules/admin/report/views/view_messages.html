@@ -1,0 +1,65 @@
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="modal-dialog modal-dialog-centered modal-lg"  role="document">
+			<div class="modal-content">
+				<div class="modal-header modal-header-seperator p-l-20 p-b-0">
+					<h2 class="modal-title">
+						<%=__("admin.report.view_messages") %>
+					</h2>
+				</div>
+				<div class="modal-body padding-20">
+					<div class="row clearfix">
+                        <div class="col-sm-12 body">
+                            <table id="view_messages" class="row-border full-length-header hover table table-bordered cb-data-table datatable"
+                                cellspacing="0" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th><%= __("admin.reports.type");%></th>
+                                        <th><%= __("admin.reports.question");%></th>
+                                        <th><%= __("admin.reports.answer");%></th>
+                                    </tr>
+                                </thead>
+                                <tbody> <%
+									message_list.map((records,index)=>{%>
+										<tr>
+											<td><%= (records.type) ? ((VOC_TYPE_FOR_CLIENT[records.type]) ? VOC_TYPE_FOR_CLIENT[records.type] :(VOC_TYPE_FOR_CAPTAIN[records.type] ? VOC_TYPE_FOR_CAPTAIN[records.type] :""))  : "" %></td>
+                                            <td><%= (records.question) ? records.question : "" %></td>
+                                            <td><%= (records.answer) ? records.answer : "" %></td>
+										</tr> <%
+									}); %>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer modal-footer-seperator">
+					<a href="javascript:void(0);" onclick="$('#form_modal').modal('hide');" ><button type="button" class="btn bg-blue-grey btn-sm waves-effect"><%= __("system.cancel"); %></button></a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<link rel="stylesheet" href="<%=WEBSITE_CSS_PATH%>jquery.mCustomScrollbar.min.css">
+<script type="text/javascript" src="<%=WEBSITE_JS_PATH%>jquery.mCustomScrollbar.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+		/** For initialization of modal datatable */
+		var dataTable = $('#view_messages').DataTable({
+			"order"     :   false,
+			"sDom"      :   "ftr",
+			"serverSide":   false,
+			"scrollX"   :   false,
+			"paging"	:	false,
+			"columnDefs": [
+				{ orderable: false, "targets": [ 0,1,2 ] }
+			],
+			"language": {
+				"emptyTable": "<%=__('admin.reports.no_message')%>"
+			}
+		});
+
+       $(".table-body-wrapper").mCustomScrollbar({
+			scrollbarPosition:"outside"
+		});
+	});
+</script>

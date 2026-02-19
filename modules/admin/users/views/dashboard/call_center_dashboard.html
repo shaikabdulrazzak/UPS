@@ -1,0 +1,56 @@
+<%
+	let totalAgentsAtNotReady   = result?.total_agents_at_not_ready || [];
+	let breakTypeList  			= result?.break_type_list || {};
+%>
+<div class="equal_spacing">
+	<div class="dashboard_page team-leader">
+		<h1><%= __("system.dashboard"); %></h1>
+		<!-- Tickets  Section -->
+			<%- include ('./dashboard_elements/ticket_info.html') %>
+
+		<!-- Offers Section -->
+			<%- include ('./dashboard_elements/offer_info.html') %>
+			
+		<!-- Order Status & Order Related Request Section -->
+			<%- include ('./dashboard_elements/order_status.html') %>
+
+		<!-- Total agent at not ready -->
+		<%	if(auth.team_head){ %>
+			<div class="number_box">
+				<h3><span><%= __("admin.dashboard.total_agent_at_not_ready")%></span></h3>
+				<div class="dashboard_number menu_box">
+					<ul>
+						<%
+						if(Object.keys(breakTypeList).length >0){
+							Object.keys(breakTypeList).map(key=>{
+								var breakCount = 0;
+								if(totalAgentsAtNotReady.length >0){
+									totalAgentsAtNotReady.map(records=>{
+										if(records._id == key) breakCount = records.total_count;
+									});
+								} %>
+								<li>
+									<div class="number_bg_box blue_border">
+										<strong><%= breakCount;%></strong>
+										<a href="<%= WEBSITE_ADMIN_URL %>team_breaks?break_type=<%=key%>" target="_blank" class="text-decoration-none reset_storage"><span><%= breakTypeList[key]%></span></a>
+									</div>
+								</li>
+							<% });
+						} %>
+					</ul>
+				</div>
+			</div>
+		<% } %>
+
+		<!-- Members info Section -->
+		<%- include ('./dashboard_elements/members_info.html') %>
+
+		<!-- Login Logout Time & Upcoming week schedule Section -->
+		<%- include ('./dashboard_elements/login_logout_and_week_schedule.html') %>
+
+	</div>
+</div>
+<%- contentFor("script") %>
+	<script type="text/javascript">
+		$(".breadcrumb").remove();
+	</script>

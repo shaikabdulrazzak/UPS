@@ -1,0 +1,80 @@
+<%
+var result 	   =  (typeof result !== typeof undefined && result) 		     ? result 	    :[];
+var branchId   =  (typeof branch_id !== typeof undefined && branch_id)       ? branch_id    :"";
+let authRoleId =  (typeof user_role_id !== typeof undefined && user_role_id) ? user_role_id :"";
+%>
+<div class="row clearfix">
+	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+		<div class="body">
+			<table id="datatable-assignment-slab-listing" class="row-border full-length-header hover table table-bordered  cb-data-table" cellspacing="0" width="100%">
+				<thead>
+					<tr>
+						<th width="30%"><%= __("branch_assignment_slab.user_name");%></th>
+						<th width="35%"><%= __("branch_assignment_slab.slabs");%></th>
+						<th width="35%"><%= __("branch_assignment_slab.created");%></th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    var checkboxArray = {};
+	/** Function to initialize datatable and get server side data*/
+	var dataTable =	"";
+	$(document).ready(function() {
+		dataTable = $('#datatable-assignment-slab-listing').DataTable({
+			"bStateSave"	: true,
+			"fnStateSave"	: function (oSettings, oData) {
+				localStorage.setItem( 'DataTables', JSON.stringify(oData) );
+			},
+			"fnStateLoad" : function (oSettings) {
+				return JSON.parse( localStorage.getItem('DataTables') );
+			},
+			"order"		: 	[],
+			"sDom"		:	"ltipr",
+			"serverSide": 	true,
+			"scrollX"	: 	true,
+			"lengthMenu":	PAGING_LENGTH_MENU,
+			"columns"	: 	[
+				{
+					"data" : 'user_name',
+					"searchable" :  false,
+					"orderable"  :  false,
+				},
+				{
+					"data"		 : "slabs",
+					"searchable" :  false,
+					"orderable"  :  false,
+					"render"     :  function (slabs) {
+						var items = "";
+						if(slabs && slabs.length > 0) {
+							let slabsData = "";
+							slabs.map(record=>{
+								slabsData+='<tr><td>'+record.min_distance+'</td><td>'+record.max_distance+'</td></tr>';
+							});
+							var items = "<table width='100%' class='row-border full-length-header hover table table-bordered cb-data-table'><thead><tr><th width='50%'><%= __('branch_assignment_slab.min');%></th><th width='50%'><%= __('branch_assignment_slab.max');%></th></tr></thead><tbody>"+slabsData+"</tbody></table>"
+							return items;
+						}
+						return (items) ? items : "N/A";
+					}
+				},
+				{
+					"data"  : 'created',
+					"render": function (created) {
+						return moment(created).tz(DEFAULT_TIME_ZONE).format(DATATABLE_DATE_TIME_FORMAT);
+					}
+				},
+				],
+			"ajax":{
+				url     : "<%= list_url %>/assignment_slabs_audit/<%=branch_id%>",
+				type    : "POST",
+				dataSrc	: function(res){
+					adjustPermissionsClass();
+					return res.data;
+				}
+			}
+		});
+	});
+</script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>

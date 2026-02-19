@@ -1,0 +1,233 @@
+<%
+  var customerId  	=  user_id;
+  var revertOrders	=  (result.revert_orders) ? result.revert_orders :[];
+  var selectedButton=  type ? type :"customer_details";
+  var originalUrl 	=  admin_list_url+"/view_customer/"+customerId;
+%>
+<div class="container-fluid">
+	<div class="row clearfix ">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="card">
+                <div class="header">
+                    <h2>
+                        <%= __('admin.user_management.customer_details'); %>
+                    </h2>
+                    <ul class="header-dropdown m-r--5 btn-right-top-margin"><%
+						if(revertOrders.length >0){ %>
+							<li class="<%= getPermissionClass(module_type,['customer_management','outstanding']); %>">
+								<a href="javascript:void(0)" data-href="<%=admin_list_url+'/pay_outstanding/'+customerId%>?view_redirect=1" class="confirm_box"  data-confirm-message="<%= __('admin.user_management.you_want_to_pay_outstanding_this_customer'); %>" data-confirm-heading="<%= __('admin.system.are_you_sure') %>">
+									<button type="button" class="btn btn-sm bg-cyan waves-effect"><%= __('admin.user_management.pay_outstanding'); %></button>
+								</a>
+							</li><%
+						} %>
+                        <li>
+                            <a href="<%=admin_list_url%>/list_customer" ><button type="button" class="btn btn-sm bg-indigo waves-effect"><%= __('admin.system.back'); %></button></a>
+                        </li>
+                    </ul>
+				</div>
+				<div class="body">
+					<a data-toggle="tab" href="#customer_details" class="get-tab-details <%= getPermissionClass(module_type,['user_detail','customer_detail']); %>" data-type="customer_details">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5  order-details-tab border-none">
+							<%= __('admin.user_management.customer_details'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/customer_order_list/<%=customerId%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['user_detail','order_list']); %>" data-type="order_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.orders'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/customer_address_list/<%=customerId%>" class="action-btn  get-tab-details <%= getPermissionClass(module_type,['user_detail','address_list']); %>" data-type="address_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.address'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/customer_package_list/<%=customerId%>" class="action-btn  get-tab-details <%= getPermissionClass(module_type,['user_detail','package_list']); %>" data-type="package_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.packages'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/refund_detail/<%=customerId%>" class="action-btn  get-tab-details <%= getPermissionClass(module_type,['user_detail','compensation_list']); %>" data-type="refund_detail">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.refund_detail'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/customer_account_list/<%=customerId%>" class="action-btn  get-tab-details <%= getPermissionClass(module_type,['user_detail','account_list']); %>" data-type="account_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.accounts'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>tickets/customer_ticket_list/<%=customerId%>" class="action-btn  get-tab-details <%= getPermissionClass(module_type,['user_detail','ticket_list']); %>" data-type="ticket_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.tickets'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/customer_wallet_details/<%=customerId%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['user_detail','wallet_details']); %>" data-type="wallet_details">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.wallet_details'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/customer_wallet_transaction_list/<%=customerId%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['user_detail','wallet_transaction_list']); %>" data-type="wallet_transaction_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.wallet_transactions'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/customer_verification_list/<%=customerId%>" class="action-btn  get-tab-details <%= getPermissionClass(module_type,['user_detail','verification_list']); %>" data-type="verification_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.verifications'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>voc_management/customer_voc_list/<%=customerId%>" class="action-btn  get-tab-details <%= getPermissionClass(module_type,['user_detail','voc_list']); %>" data-type="voc_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.voc'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=WEBSITE_ADMIN_URL%>payment_transaction/customer_payment_transaction_list/<%=customerId%>" class="action-btn  get-tab-details <%= getPermissionClass(module_type,['user_detail','payment_transaction_list']); %>" data-type="payment_transaction_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.payment_transactions'); %>
+						</button>
+					</a>
+					<a href="<%= originalUrl %>" data-action-url="<%=admin_list_url%>/customer_reward_points_list/<%=customerId%>/<%=POINTS_AMOUNT%>" class="action-btn get-tab-details <%= getPermissionClass(module_type,['user_detail','reward_points_list']); %>" data-type="reward_points_list">
+						<button type="button" class="btn btn-sm waves-effect btn-success m-t-5">
+							<%= __('admin.user_management.reward_points'); %>
+						</button>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row clearfix">
+		<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+			<div class="tab-content">
+				<div id="customer_details" class="tab-pane <%= selectedButton == 'customer_details' ? 'fade in active' : '' %>">
+					<div class="card">
+						<div class="header">
+							<h2>
+								<%= __('admin.user_management.customer_details'); %>
+							</h2>
+						</div>
+						<div class="body table-responsive" id="aniimated-thumbnials">
+							<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+								<tr>
+									<th class="text-right" width="25%"><%= __('admin.user_management.full_name'); %></th>
+									<td><span><%=result?.full_name || ""%></span></td>
+								</tr>
+								<tr>
+									<th class="text-right"><%= __('admin.user_management.phone_number'); %></th>
+									<td><%= result?.mobile_number || "N/A"%></td>
+								</tr>
+								<tr>
+									<th class="text-right"><%= __('admin.user_management.secondary_mobile_number'); %></th>
+									<td><%= result?.cust_tele2 || "N/A"%></td>
+								</tr>
+								<%
+									var status 		= 	result?.active || DEACTIVE;
+									var statusClass	=	(status	==	ACTIVE)	?	"label-success"				:"label-danger";
+									var statusText	=	(status	==	ACTIVE)	?	__('admin.system.active')	:__('admin.system.inactive');
+									var isGuest		=	(result?.is_guest == true) ? '<span class="label label-warning m-l-5 m-t-5">' + __("admin.user_management.guest_user") + '</span>' : ''
+								%>
+								<tr>
+									<th class="text-right"><%= __('admin.system.status'); %></th>
+									<td>
+										<span class="label <%= statusClass %>"><%= statusText %></span>
+										<%- isGuest; %>
+									</td>
+								</tr>
+								<tr>
+									<th class="text-right"><%= __('admin.system.modified'); %></th>
+									<td>
+										<span>
+											<%= result?.modified && newDate(result.modified,AM_PM_FORMAT_WITH_DATE) ||'';%>
+										</span>
+									</td>
+								</tr>
+								<tr>
+									<th class="text-right"><%= __('admin.user_management.category'); %></th>
+									<td><%= (result.client_type) ? USER_CLIENT_TYPE[result.client_type] :"";%></td>
+								</tr>
+								<%
+									var googleId 	= (result.google_id)   ?  __('admin.user_management.google')   :"";
+									var facebookId 	= (result.facebook_id) ?  __('admin.user_management.facebook') :"";
+									var twitterId 	= (result.twitter_id)  ?  __('admin.user_management.twitter')  :"";
+								%>
+								<tr>
+									<th class="text-right"><%= __('admin.user_management.opt_in'); %></th>
+									<td><%=(googleId || facebookId || twitterId) ? googleId+" "+facebookId+" "+twitterId : __("admin.user_management.normal")%></td>
+								</tr>
+								<tr>
+									<th class="text-right"><%= __("admin.user_management.verification_code"); %></th>
+									<td><%=result?.otp || "N/A"%></td>
+								</tr><%
+								if(result?.revert_orders?.length >0){ %>
+									<tr>
+										<th class="text-right"><%= __("admin.user_management.order_outstanding");%></th>
+										<td>
+											<table  class="row-border hover table table-bordered" cellspacing="0" width="100%">
+												<tr>
+													<th class="text-left" width="45%"><%= __('admin.user_management.order_id'); %></th>
+													<th class="text-left" width="45%"><%= __('admin.user_management.amount'); %></th>
+												</tr><%
+												let totalOutstanding = 0;
+												result.revert_orders.map(records=>{
+													let outstandingAmount   =   records.outstanding_amount;
+													totalOutstanding        +=  outstandingAmount;
+													%>
+													<tr>
+														<td>
+															<a href="<%=WEBSITE_ADMIN_URL+'orders/view/'+records.order_id %>" target="_blank">
+																<%=records.unique_order_id%>
+															</a>
+														</td>
+														<td>
+															<%= currencyFormat(outstandingAmount) %>
+														</td>
+													</tr><%
+												}); %>
+												<tr>
+													<th> <%= __('admin.user_management.total_amount'); %></th>
+													<td> <%= currencyFormat(totalOutstanding) %> </td>
+												</tr>
+											</table>
+										</td>
+									</tr> <%
+								} %>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="main-container"></div>
+</div>
+<input type="hidden" name="script_init" id="script_init" value=""/>
+<%- contentFor('css') %>
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/css/bootstrap-select.css">
+	<link rel="stylesheet" href="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.css">
+
+<%- contentFor("script") %>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>daterange/daterangepicker.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>bootstrap-select/js/bootstrap-select.js"></script>
+	<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PLUGIN_PATH%>datepicker/bootstrap-datepicker.min.js"></script>
+	<script type="text/javascript">
+		/* Event triggered when click on tab btn */
+		$(document).on('click','.get-tab-details',function(e){
+			$('.get-tab-details').removeClass('active');
+			$(this).addClass('active');
+			let type = $(this).attr("data-type");
+			$("#customer_details").addClass("hide");
+
+			if(type != "customer_details"){
+				window.history.replaceState(null, null, "<%= originalUrl+'/'%>"+type);
+			}else{
+				$("#main-container").html("");
+				$("#customer_details").removeClass("hide");
+			}
+		});
+
+		$('[data-type="<%=selectedButton%>"]').trigger("click");
+	</script>
+<script type="text/javascript" src="<%= WEBSITE_ADMIN_JS_PAGE_PATH %>date_range_picker/config.js"></script>
+<script type="text/javascript" src="<%=WEBSITE_ADMIN_JS_PATH%>datatable_state_storage.js"></script>
+
+

@@ -1,0 +1,687 @@
+<%
+let languageCode		    =	(item_display_lng_code) ? item_display_lng_code :DEFAULT_LANGUAGE_CODE;
+var cartList                = 	(typeof cart_list !== typeof undefined && cart_list)	?	cart_list :{};
+var outstandingOrderAmount 	= 	(cartList.outstanding_order_amount)	? cartList.outstanding_order_amount :0;
+var outstandingOrderList    = 	(cartList.outstanding_order_list)	? cartList.outstanding_order_list   :[];
+var unavailableItemList     = 	(typeof unavailable_items_list !== typeof undefined && unavailable_items_list)	?	unavailable_items_list :{};
+var outstandingOrderLink    =   "";
+
+if(outstandingOrderList.length >0){
+    outstandingOrderList.map((records,index)=>{
+        if(records.unique_order_id){
+            if(index >0) outstandingOrderLink += ", ";
+
+            outstandingOrderLink +=  '<a class="col-dark-gray text-decoration-none" href="'+WEBSITE_ADMIN_URL+'orders/view/'+records.order_id+'" target="_blank"><span class="font-12">'+records.unique_order_id+'<span></a>';
+        }
+    });
+    outstandingOrderLink = "("+outstandingOrderLink+")";
+}
+%>
+<!-- CART SECTION CODE START -->
+
+<%
+if(cartList.result.length > 0){
+%>
+    <form id="place-order" action="<%= list_url %>/place_order" data-submit-btn-id="place-order-btn-id" method="post" class="on_click_submit" role="form">
+        <h4><%= __('admin.order.my_cart'); %></h4>
+        <%
+        let	grandTotal			=	(cartList.grand_total)	 	? cartList.grand_total 		:0;
+        let	itemImageUrl		=	(cartList.item_image_url)	? cartList.item_image_url 	:"";
+        cartList.result.map(cartRecords=>{
+            let customerId 		=	(cartRecords.customer_id) 	    ? cartRecords.customer_id	:"";
+            let restaurantId	=	(cartRecords.restaurant_id) 	? cartRecords.restaurant_id	:"";
+            let branchId 		=	(cartRecords.branch_id) 	    ? cartRecords.branch_id		:"";
+            let itemList 		=	(cartRecords.item_list) 	    ? cartRecords.item_list		:"";
+            let discount 		=	(cartRecords.discount) 	        ? cartRecords.discount		:"";
+            let OfferList 		=	(cartRecords.eligible_offer_list) ? cartRecords.eligible_offer_list	:"";
+            let simphony        =   cartRecords.simphony ? cartRecords.simphony :false;
+            %>
+            <input type="hidden" value="<%= user_id %>" class="user_id" name="user_id" />
+            <input type="hidden" value="<%= restaurantId %>" class="restaurant_id" name="restaurant_id" />
+            <input type="hidden" value="<%= branchId %>" class="branch_id" name="branch_id" />
+            <%
+            if(OfferList.length > 0){
+                %>
+                <h5><%= __('admin.order.offer_code') %></h5>
+                <ul class="list-group">
+                <%
+                OfferList.map(offerRecords=>{
+                    let offerId 		=	(offerRecords._id)		     ? offerRecords._id:"";
+                    let offerCode 		=	(offerRecords.offer_code) 	 ? offerRecords.offer_code:"";
+                    let title 			=	(offerRecords.title) 	     ? offerRecords.title[languageCode]:"";
+                    let description 	=	(offerRecords.description) 	 ? offerRecords.description[languageCode]:"";
+                    %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <%= title %>
+                        <span class="badge badge-primary badge-pill"><%= offerCode %></span>
+                      </li>
+                <%
+                });
+                %>
+            </ul>
+                <%
+            }
+            if(itemList.length > 0){
+            %>
+            <div class="row">
+                <div class="col-sm-12 table-responsive">
+                    <table class="table table-hover">
+                        <thead class="cart_table_header">
+                            <tr>
+                                <th><%= __('admin.order.items'); %></th>
+                                <th class="text-center"><%= __('admin.order.quantity'); %></th>
+                                <th class="text-center"><%= __('admin.order.price'); %></th>
+                                <th class="text-center"><%= __('admin.order.total'); %></th>
+                                <th width = "20px"> </th>
+                            </tr>
+                        </thead>
+                        <tbody >
+                            <%
+                            let notAvailable    =   false;
+                            itemList.map(itemRecords=>{
+								let cartId 			=	(itemRecords._id)		 ? itemRecords._id:"";
+                                let itemId 			=	(itemRecords.item_id) 	 ? itemRecords.item_id:"";
+                                let itemType 		=	(itemRecords.item_type)  ? itemRecords.item_type:"";
+                                let itemName 		=	(itemRecords.item_name)  ? itemRecords.item_name[languageCode]:"";
+                                let unitList 		=	(itemRecords.unit_lists)  ? itemRecords.unit_lists:"";
+                                let unitName 		=	(itemRecords.unit_list)  ? itemRecords.unit_list:{};
+                                let itemMainPrice	=	(itemRecords.item_main_price)  ? itemRecords.item_main_price:0;
+                                let itemNameArabic 	=	(itemRecords.item_name)  ? itemRecords.item_name.ar:"";
+                                let itemImage 		=	(itemRecords.item_image) ? itemRecords.item_image:"";
+                                let itemPrice 		=	(itemRecords.item_price) ? itemRecords.item_price:"";
+                                let discount 		=	(itemRecords.discount)	 ? itemRecords.discount:"";
+								let itemAvailable 	=	(itemRecords.item_available) ? itemRecords.item_available		:"";
+                                let subPrice 		=	(itemRecords.sub_price)  ? itemRecords.sub_price:"";
+                                let qty 			=	(itemRecords.qty)		 ? itemRecords.qty:"";
+                                let image			=	(itemRecords.item_image) ? itemRecords.item_image:"";
+                                let note			=	(itemRecords.note) ? itemRecords.note:"";
+                                let extraItemList	=	(typeof itemRecords.extra_item_list !== typeof undefined && itemRecords.extra_item_list && itemRecords.extra_item_list.detail) ?	itemRecords.extra_item_list.detail :[];
+
+                                %>
+                                <tr class="add_new_items disable cartId_<%= cartId %>">
+                                    <td>
+                                        <div class="media">
+                                            <%
+                                            if(image){
+                                            %>
+                                            <a class="thumbnail pull-left" href="javascript:void(0)">
+                                                <img class="media-object set_image_med_dim" src="<%= itemImageUrl+image %>" onerror="this.src='<%= NO_IMAGE_AVAILABLE%>'">
+                                            </a>
+                                            <%
+                                            }
+                                            %>
+                                            <div class="media-body pl5">
+                                                <h4 class="media-heading">
+													<%= itemName+' ('+currencyFormat(itemMainPrice)+')' %>
+                                                </h4>
+
+												<%
+												let itemHtml	= '';
+												if(unitList && unitList.length > 0){
+													let text	=	(itemType == HALF_AND_HALF_ITEM) ? __('admin.order.half_pizza') : __('admin.order.pizza');
+													if(itemType == HALF_AND_HALF_ITEM || itemType == DEAL_ITEM){
+														unitList.map((data,key)=>{
+															let extraItemsArray = data.extra_items ? data.extra_items : [];
+															let extraItemHtml = "";
+															if(extraItemsArray && extraItemsArray.length > 0){
+																extraItemsArray.map((exItemRecords,parentIndex)=>{
+																	exItemRecords.extra_item_ids.map((tmpExItem,index)=>{
+																		let extraItemName = tmpExItem.extra_item_name && tmpExItem.extra_item_name[ languageCode] ? tmpExItem.extra_item_name[languageCode]+' ('+currencyFormat(tmpExItem.extra_fees)+')' : "";
+																		extraItemHtml += (parentIndex != 0 && index != 0) ? ' ' : ' ';
+																		extraItemHtml += extraItemName;
+																	});
+																});
+															}
+															key	=	key+1;
+															var unitNames	=	(data.deal_pizza_select) ? data.deal_pizza_select :"";
+															itemHtml	+=	key+'. '+text+': ' +unitNames+'<br/>';
+															if(extraItemHtml){
+																itemHtml += __("admin.order.extra_item")+ ':'+extraItemHtml+'<br/>';
+															}
+														});
+													}
+												}else{
+													if(unitName && typeof unitName !== typeof undefined && unitName[languageCode]){
+														itemHtml += (unitName[languageCode]) ? __("Unit")+ ':'+unitName[languageCode]+"<br/>" : '';
+													}
+												}
+                                                %>
+													<span class="text-success"><strong>
+														<%- itemHtml%>
+													</span>
+
+                                                <%
+                                                if(!itemAvailable){
+                                                    notAvailable    =   true;
+                                                %>
+                                                <h5><%= __('admin.order.status') %> </span><span class="text-danger"><strong>
+                                                    <%= __('admin.order.item_not_available'); %></strong>
+                                                </h5>
+                                                <%
+                                                }
+                                                %>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="text-align: center">
+                                        <div class="row addtocart itemdetail-popup">
+											<div class="restaurant_processing">
+												<div class="form-group">
+													<div class="input-group cart_number">
+														<button type="button" class="btn btn-danger btn-number-cart icons_<%= cartId%>" data-id="<%= cartId%>"  data-type="minus" data-field="qty-cart">
+															<span class="glyphicon glyphicon-minus"></span>
+														</button>
+														<input type="text" name="qty-cart" class="form-control input-number-cart update_quantity_<%= cartId%>" value="<%= qty %>" min="1" max="200" data-value="<%= qty %>" data-cart-id="<%= cartId%>">
+														<button type="button" class="btn btn-success btn-number-cart icons_<%= cartId%>" data-id="<%= cartId%>" data-type="plus" data-field="qty-cart">
+															<span class="glyphicon glyphicon-plus"></span>
+														</button>
+													</div>
+												</div>
+												<a href="javascript:void(0);" class="btn btn-warning hide update_button_<%= cartId%> quantity_change" data-id="<%= cartId%>">
+													<%= __('admin.order.update_quantity') %>
+												</a>
+											</div>
+										</div>
+                                    </td>
+                                    <td class="text-center"><strong><%= currencyFormat(itemPrice) %></strong></td>
+                                    <td class="text-center"><strong><%= currencyFormat(subPrice) %></strong></td>
+                                    <td class="text-right" >
+                                        <a href="javascript:void(0)" data-confirm-message="<%= __("admin.order.you_want_to_delete_this_cart"); %>" data-confirm-heading="<%= __("admin.system.are_you_sure") %>" class=" cart_delete" id="<%= cartId %>"><img src="<%= WEBSITE_ADMIN_IMG_URL %>/delete-icon.svg" alt="img"></a>
+                                    </td>
+                                </tr>
+                                <%
+                                if(extraItemList.length > 0){
+                                    var extraHtml	=	[];
+                                    extraItemList.map(item=>{
+                                        let tmpPriceStr = currencyFormat(item.extra_fees);
+                                        if(simphony && item.qty >0) tmpPriceStr = item.qty+" x "+tmpPriceStr;
+                                        extraHtml.push(item.name[languageCode]+' ('+tmpPriceStr+')');
+                                    });
+                                %>
+                                <tr class="add_new_items disable cartId_<%= cartId %>">
+                                    <td colspan="5" class="cart_item_note">
+                                        <span><%= __('admin.order.extra_items') %> </span> <span class="text-success font-13"><strong>
+                                            <%- (itemHtml) ? '</br>'+extraHtml.join(', ') : extraHtml.join(', '); %></strong>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <%
+                                }%>
+                                <tr class="add_new_items disable cartId_<%= cartId %>">
+                                    <td colspan="4" class="cart_item_note">
+                                        <%
+                                        if(note){%>
+                                        <span><%= __('admin.order.note') %> </span><span class="text-success"><strong>
+                                            <%= note; %></strong>
+                                        </span><br/>
+                                        <%
+                                        }%>
+                                    </td>
+                                    <td colspan="1" class="cart_item_note text-right" >
+                                        <a href="javascript:void(0);" data-action="<%=admin_list_url%>/edit_note/<%= cartId %>" title=" <%= (note) ? 'Edit Note' : 'Add Note'; %>" data-open-modal="true" class="edit_note" ><img src="<%= WEBSITE_ADMIN_IMG_URL %>/<%= (note) ? 'edit.png' : 'add_note.png'; %>" alt="img"></a>
+                                    </td>
+                                </tr>
+                            <%
+                            });
+                            %>
+                            <tr>
+                                <td colspan="2">
+									<div class="couponcodebox">
+                                    <input type="text" class="form-control" name="coupon_code" id="coupon_code" placeholder="<%= __('admin.order.enter_coupon_code_here') %>">
+                                    <a href="javascript:void(0);" class="btn btn-warning submit_redeem">
+                                        <span class="glyphicon glyphicon-tag"></span>
+                                        <%= __('admin.order.apply_coupon') %>
+                                    </a>
+									</div>
+									<span class="error coupon_code_error"></span>
+                                </td>
+                                <td  colspan=2><h5><%= __('admin.order.sub_total'); %></h5></td>
+                                <td class="textright"><h5><strong><%= currencyFormat(grandTotal+discount) %></strong></h5></td>
+                            </tr> <%
+                            if(discount){ %>
+                                <tr>
+                                    <td colspan=2></td>
+                                    <td  colspan=2><h5><%= __('admin.order.discount'); %></h5></td>
+                                    <td class="textright"><h5><strong><%= currencyFormat(discount) %></strong></h5></td>
+                                </tr><%
+                            }
+                            if(outstandingOrderAmount >0){
+                                grandTotal +=outstandingOrderAmount;
+                            %>
+                                <tr>
+								    <td colspan=2></td>
+                                    <td  colspan=2><h5><%- __('admin.user_management.order_outstanding')+"<br/>"+outstandingOrderLink; %></h5></td>
+                                    <td class="textright"><h5><strong><%= currencyFormat(outstandingOrderAmount) %></strong></h5></td>
+                                </tr><%
+                            } %>
+                            <tr>
+                                <td colspan=2></td>
+								<td  colspan=2><h5><%= __('admin.order.total'); %></h5></td>
+                                <td class="textright"><h5><strong><%= currencyFormat(grandTotal) %></strong></h5></td>
+                            </tr>
+                            <tr>
+                                <td colspan=3></td>
+                                <td></td>
+                                <td class="textright">
+                                    <button type="button" class="btn btn-success payment" id="place-order-btn-id" <%- ADMIN_LOADING_TEXT %>  <%- (notAvailable) ? "disabled":'';%>>
+                                        <%= __("admin.oreder.checkout"); %>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <%
+            }
+        });
+        %>
+    </form>
+<%
+}else{
+
+%>
+    <h4><%= __('admin.order.my_cart'); %></h4>
+    <div class="row">
+        <div class="col-sm-12 table-responsive">
+            <table class="table table-hover ">
+                <thead class="cart_table_header">
+                    <tr>
+                        <th><%= __('admin.order.items'); %></th>
+                        <th class="text-center"><%= __('admin.order.quantity'); %></th>
+                        <th class="text-center"><%= __('admin.order.price'); %></th>
+                        <th class="text-center"><%= __('admin.order.total'); %></th>
+                        <th width = "20px"> </th>
+                    </tr>
+                </thead>
+                <tbody >
+                    <tr>
+                        <td class="text-center width-100" colspan="5">
+                            <%= __("admin.order.no_item_in_cart")%>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+<%  } %>
+
+<%
+if(unavailableItemList.result.length > 0){
+%>
+    <form id="place-order" action="<%= list_url %>/place_order" data-submit-btn-id="place-order-btn-id" method="post" class="on_click_submit" role="form">
+        <h4><%= __('admin.order.no_longer_available'); %></h4>
+        <%
+        let	grandTotal			=	(unavailableItemList.grand_total)	 	? unavailableItemList.grand_total 		:0;
+        let	itemImageUrl		=	(unavailableItemList.item_image_url)	? unavailableItemList.item_image_url 	:"";
+        unavailableItemList.result.map(unavailableItemRecords=>{
+            let customerId 		=	(unavailableItemRecords.customer_id) 	    ? unavailableItemRecords.customer_id	:"";
+            let restaurantId	=	(unavailableItemRecords.restaurant_id) 	? unavailableItemRecords.restaurant_id	:"";
+            let branchId 		=	(unavailableItemRecords.branch_id) 	    ? unavailableItemRecords.branch_id		:"";
+            let itemList 		=	(unavailableItemRecords.item_list) 	    ? unavailableItemRecords.item_list		:"";
+            let discount 		=	(unavailableItemRecords.discount) 	        ? unavailableItemRecords.discount		:"";
+            let OfferList 		=	(unavailableItemRecords.eligible_offer_list) ? unavailableItemRecords.eligible_offer_list	:"";
+
+            %>
+            <input type="hidden" value="<%= user_id %>" class="user_id" name="user_id" />
+            <input type="hidden" value="<%= restaurantId %>" class="restaurant_id" name="restaurant_id" />
+            <input type="hidden" value="<%= branchId %>" class="branch_id" name="branch_id" />
+            <%
+            if(OfferList.length > 0){
+                %>
+                <h5><%= __('admin.order.offer_code') %></h5>
+                <ul class="list-group">
+                <%
+                OfferList.map(offerRecords=>{
+                    let offerId 		=	(offerRecords._id)		     ? offerRecords._id:"";
+                    let offerCode 		=	(offerRecords.offer_code) 	 ? offerRecords.offer_code:"";
+                    let title 			=	(offerRecords.title) 	     ? offerRecords.title[languageCode]:"";
+                    let description 	=	(offerRecords.description) 	 ? offerRecords.description[languageCode]:"";
+                    %>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <%= title %>
+                        <span class="badge badge-primary badge-pill"><%= offerCode %></span>
+                      </li>
+                <%
+                });
+                %>
+            </ul>
+                <%
+            }
+            if(itemList.length > 0){
+            %>
+            <div class="row">
+                <div class="col-sm-12 table-responsive">
+                    <table class="table table-hover">
+                        <thead class="cart_table_header">
+                            <tr>
+                                <th><%= __('admin.order.items'); %></th>
+                                <th class="text-center"><%= __('admin.order.quantity'); %></th>
+                                <th class="text-center"><%= __('admin.order.price'); %></th>
+                                <th class="text-center"><%= __('admin.order.total'); %></th>
+
+                            </tr>
+                        </thead>
+                        <tbody >
+                            <%
+                            let notAvailable    =   false;
+                            itemList.map(itemRecords=>{
+								let cartId 			=	(itemRecords._id)		 ? itemRecords._id:"";
+                                let itemId 			=	(itemRecords.item_id) 	 ? itemRecords.item_id:"";
+                                let itemType 		=	(itemRecords.item_type)  ? itemRecords.item_type:"";
+                                let itemName 		=	(itemRecords.item_name)  ? itemRecords.item_name[languageCode]:"";
+                                let unitList 		=	(itemRecords.unit_lists)  ? itemRecords.unit_lists:"";
+                                let unitName 		=	(itemRecords.unit_list)  ? itemRecords.unit_list:{};
+                                let itemMainPrice	=	(itemRecords.item_main_price)  ? itemRecords.item_main_price:0;
+                                let itemNameArabic 	=	(itemRecords.item_name)  ? itemRecords.item_name.ar:"";
+                                let itemImage 		=	(itemRecords.item_image) ? itemRecords.item_image:"";
+                                let itemPrice 		=	(itemRecords.item_price) ? itemRecords.item_price:"";
+                                let discount 		=	(itemRecords.discount)	 ? itemRecords.discount:"";
+								let itemAvailable 	=	(itemRecords.item_available) ? itemRecords.item_available		:"";
+                                let subPrice 		=	(itemRecords.sub_price)  ? itemRecords.sub_price:"";
+                                let qty 			=	(itemRecords.qty)		 ? itemRecords.qty:"";
+                                let image			=	(itemRecords.item_image) ? itemRecords.item_image:"";
+                                let note			=	(itemRecords.note) ? itemRecords.note:"";
+                                let extraItemList	=	(typeof itemRecords.extra_item_list !== typeof undefined && itemRecords.extra_item_list && itemRecords.extra_item_list.detail) ?	itemRecords.extra_item_list.detail :[];
+
+                                %>
+                                <tr class="add_new_items disable cartId_<%= cartId %>">
+                                    <td>
+                                        <div class="media">
+                                            <%
+                                            if(image){
+                                            %>
+                                            <a class="thumbnail pull-left" href="javascript:void(0)">
+                                                <img class="media-object set_image_med_dim" src="<%= itemImageUrl+image %>" onerror="this.src='<%= NO_IMAGE_AVAILABLE%>'">
+                                            </a>
+                                            <%
+                                            }
+                                            %>
+                                            <div class="media-body pl5">
+                                                <h4 class="media-heading">
+													<%= itemName+' ('+currencyFormat(itemMainPrice)+')' %>
+                                                </h4>
+
+												<%
+												let itemHtml	= '';
+												if(unitList && unitList.length > 0){
+													let text	=	(itemType == HALF_AND_HALF_ITEM) ? __('admin.order.half_pizza') : __('admin.order.pizza');
+													if(itemType == HALF_AND_HALF_ITEM || itemType == DEAL_ITEM){
+														unitList.map((data,key)=>{
+															let extraItemsArray = data.extra_items ? data.extra_items : [];
+															let extraItemHtml = "";
+															if(extraItemsArray && extraItemsArray.length > 0){
+																extraItemsArray.map((exItemRecords,parentIndex)=>{
+																	exItemRecords.extra_item_ids.map((tmpExItem,index)=>{
+																		let extraItemName = tmpExItem.extra_item_name && tmpExItem.extra_item_name[ languageCode] ? tmpExItem.extra_item_name[languageCode]+' ('+currencyFormat(tmpExItem.extra_fees)+')' : "";
+																		extraItemHtml += (parentIndex != 0 && index != 0) ? ' ' : ' ';
+																		extraItemHtml += extraItemName;
+																	});
+																});
+															}
+															key	=	key+1;
+															var unitNames	=	(data.deal_pizza_select) ? data.deal_pizza_select :"";
+															itemHtml	+=	key+'. '+text+': ' +unitNames+'<br/>';
+															if(extraItemHtml){
+																itemHtml += __("admin.order.extra_item")+ ':'+extraItemHtml+'<br/>';
+															}
+														});
+													}
+												}else{
+													if(unitName && typeof unitName !== typeof undefined && unitName[languageCode]){
+														itemHtml += (unitName[languageCode]) ? __("Unit")+ ':'+unitName[languageCode]+"<br/>" : '';
+													}
+												}
+                                                %>
+													<span class="text-success"><strong>
+														<%- itemHtml%>
+													</span>
+
+                                                <%
+                                                if(!itemAvailable){
+                                                    notAvailable    =   true;
+                                                %>
+                                                <h5><%= __('admin.order.status') %> </span><span class="text-danger"><strong>
+                                                    <%= __('admin.order.item_not_available'); %></strong>
+                                                </h5>
+                                                <%
+                                                }
+                                                %>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="text-center"><strong><%= qty %></strong></td>
+                                    <td class="text-center"><strong><%= currencyFormat(itemPrice) %></strong></td>
+                                    <td class="text-center"><strong><%= currencyFormat(subPrice) %></strong></td>
+
+                                </tr>
+                                <%
+                                if(extraItemList.length > 0){
+                                    var extraHtml	=	[];
+                                    extraItemList.map(item=>{
+                                        extraHtml.push(item.name[languageCode]+' ('+currencyFormat(item.extra_fees)+')');
+                                    });
+                                %>
+                                <tr class="add_new_items disable cartId_<%= cartId %>">
+                                    <td colspan="4" class="cart_item_note">
+                                        <span><%= __('admin.order.extra_items') %> </span> <span class="text-success font-13"><strong>
+                                            <%- (itemHtml) ? '</br>'+extraHtml.join(', ') : extraHtml.join(', '); %></strong>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <%
+                                }%>
+                            <%
+                            });
+                            %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <%
+            }
+        });
+        %>
+    </form>
+<%
+}%>
+
+<!-- CART SECTION CODE STOP -->
+<script type="text/javascript">
+    $(document).ready(function(){
+        /**
+         * Function to push item into cart
+         */
+        $('.payment').click(function(){
+			var btnId = $(this).attr("id");
+			startTextLoading(btnId);
+			var userId          =   $('.user_id').val();
+            var branchId        =   $('.branch_id').val();
+            var restaurantId    =   $('.restaurant_id').val();
+            var scheduledTime   = '<%=scheduled_time%>';
+	    	var isScheduled     = '<%=is_scheduled%>';
+		    var deliveryBy      = '<%=delivery_by%>';
+            var addressId       = '<%=address_id%>';
+            var areaId       = '<%=area_id%>';
+			$.ajax({
+				url 	:	"<%=list_url%>/get_payment_method",
+				type	: 	"POST",
+				data	:	{'branch_id':branchId,'restaurant_id':restaurantId,'user_id':userId, address_id: addressId,  delivery_by: deliveryBy, scheduled_time: scheduledTime, is_scheduled: isScheduled,area_id : areaId },
+				success	: 	function(response){
+                    if(response.constructor !== Object){
+                        $('#form_modal').html(response);
+                    }else if(response.message){
+                        notice('error',response.message);
+                    }
+                    stopTextLoading(btnId);
+				}
+			});
+		});
+
+        /**
+         * Function to delete item into cart
+         */
+        $(".cart_delete").click(function(){
+            var cartId 				=	$(this).attr('id');
+            var confirmMessage  	=	$(this).attr('data-confirm-message');
+            var confirmHeading  	= 	$(this).attr('data-confirm-heading');
+            confirmBox("warning",confirmHeading,confirmMessage,function(result){
+                if(result){
+                    $.ajax({
+                        url 	:	"<%=list_url%>/delete_item_cart",
+                        type	: 	"POST",
+                        data	:	{'cart_id':cartId,'user_id' : '<%= user_id%>',restaurant_id:'<%= restaurant_id%>'},
+                        success	: 	function(res){
+                            if(res.status == 'success'){
+                                notice('success',res.message);
+                                myCart();
+                                swal.close();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        /**
+         * Function to submit coupon code
+         */
+        $(".submit_redeem").click(function(){
+            var couponCode      =   $('#coupon_code').val();
+            var userId          =   $('.user_id').val();
+            var branchId        =   $('.branch_id').val();
+            var restaurantId    =   $('.restaurant_id').val();
+            var deviceId        =   $('.device_id').val();
+            if(couponCode){
+                $.ajax({
+                    url 	:	"<%=list_url%>/apply_coupon",
+                    type	: 	"POST",
+                    data    :   {'offer_code':couponCode,'branch_id':branchId,'restaurant_id':restaurantId,'user_id':userId},
+                    success	: 	function(res){
+                        if(res.status == 'success'){
+                            notice('success','<%= __("admin.order.offer_apply_successfully") %>');
+                            myCart();
+                        }else{
+                            $('.coupon_code_error').html(res.message);
+                        }
+                    }
+                });
+            }else{
+                $('.coupon_code_error').html('<%= __("admin.order.please_enter_coupon_code")%>');
+            }
+        });
+    });
+
+    /***
+	* Change Quantity value from plus and minus
+	*/
+	$('.input-number-cart').focus(function(e){
+		e.preventDefault();
+		var cartId	  	= $(this).attr('data-cart-id');
+		$('.update_button_'+cartId).removeClass('hide');
+	});
+
+	$('.quantity_change').click(function(e){
+		e.preventDefault();
+		var cartId	  	    =   $(this).attr('data-id');
+		var currentVal 	    =   parseInt($('.update_quantity_'+cartId).val());
+		var currentActualVal=   parseInt($('.update_quantity_'+cartId).attr('data-value'));
+		let minValue	    =   $('.update_quantity_'+cartId).attr('min');
+
+        if(currentVal != 0 && currentVal > 0){
+			updateCart(cartId);
+			$('.payment').attr('disabled', false);
+		}else{
+			notice('error','<%= __("user_carts.please_enter_valid_numeric_value")%>');
+			$('.payment').attr('disabled', true);
+		}
+	});
+
+    /***
+    * Change Quantity value from plus and minus
+    */
+    $('.btn-number-cart').click(function(e){
+		e.preventDefault();
+		var cartId	  = $(this).attr('data-id');
+		$('.icons_'+cartId).attr('disabled',true);
+		var fieldName = $(this).attr('data-field');
+		var type      = $(this).attr('data-type');
+		var input = $(".update_quantity_"+cartId);
+		var currentVal = parseInt(input.val());
+		if (!isNaN(currentVal)) {
+			if(type == 'minus') {
+				if(currentVal > input.attr('min')) {
+					input.val(currentVal - 1).change();
+					updateCart(cartId);
+				}
+				if(parseInt(input.val()) == input.attr('min')) {
+					$('.icons_'+cartId).attr('disabled',false);
+					$(this).attr('disabled', true);
+				}
+			} else if(type == 'plus') {
+				if(currentVal < input.attr('max')) {
+					input.val(currentVal + 1).change();
+					updateCart(cartId);
+				}
+				if(parseInt(input.val()) == input.attr('max')) {
+					$('.icons_'+cartId).attr('disabled',false);
+					$(this).attr('disabled', true);
+				}
+			}
+		} else {
+			input.val(0);
+		}
+	});
+
+	function updateCart(cartId){
+		var qty					=	$('.update_quantity_'+cartId).val();
+		var currentActualVal 	= 	parseInt($('.update_quantity_'+cartId).attr('data-value'));
+		var userId      		=   $('.user_id').val();
+		var branchId    		=   $('.branch_id').val();
+		var restaurantId		=   $('.restaurant_id').val();
+		if(qty){
+			$.ajax({
+				url 	:	"<%=admin_list_url%>/update_cart_qty",
+				type	: 	"POST",
+				data    :   {'cart_id':cartId,'branch_id':branchId,'restaurant_id':restaurantId,'user_id':userId,qty:qty},
+				success	: 	function(res){
+					if(res.status == 'success'){
+						notice('success','<%= __("admin.order.quantity_updated_successfully") %>');
+						myCart();
+						$('.payment').attr('disabled', false);
+					}else{
+						notice('error',res.message);
+						$('.payment').attr('disabled', true);
+						$('.update_quantity_'+cartId).val(currentActualVal);
+					}
+				}
+			});
+		}
+	}
+
+    /**
+	 * To edit_note
+	 */
+	$('.edit_note').click(function(){
+		var url			=	$(this).attr('data-action');
+        var branchId    =   $('.branch_id').val();
+		$.ajax({
+			url       : url,
+			type      : "POST",
+			data	  : { branch_id: branchId, is_submit:false, 'user_id': '<%= user_id%>', restaurant_id: '<%= restaurant_id%>', branch_id: branchId, 'area_id': '<%= area_id%>', address_id: '<%= address_id%>', is_scheduled: '<%= is_scheduled%>', 'scheduled_time': '<%= scheduled_time%>', delivery_by: '<%= delivery_by%>'},
+			success: function(response){
+				$('#edit_note_model').html(response);
+				$('#edit_note_model').modal("show");
+			},
+		});
+	});
+
+    /**
+	 * To scroll the form modal
+	 */
+	$('#edit_note_model').on("hidden.bs.modal", function (e) {
+		if ($('.modal:visible').length) {
+			$('body').addClass('modal-open');
+		}
+	});
+</script>
